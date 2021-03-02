@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest --passWithNoTests",
     "lint": "standard",
-    "watch": "npm test -- --watch"
+    "watch": "npm test -- --watch",
+    "dev": "npm run watch"
   },
   "repository": {
     "type": "git",
