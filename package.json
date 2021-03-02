@@ -4,7 +4,7 @@
   "version": "1.0.0-dev",
   "main": "src/index.js",
   "scripts": {
-    "test": "jest --passWithNoTests",
+    "test": "jest --passWithNoTests --config test/jest.config.js",
     "lint": "eslint .",
     "watch": "npm test -- --watch",
     "dev": "npm run watch"
