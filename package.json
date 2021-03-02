@@ -29,6 +29,7 @@
     "jest-runner-eslint": "^0.10.0"
   },
   "dependencies": {
+    "chokidar": "^3.5.1",
     "yargs": "^16.2.0"
   }
 }
