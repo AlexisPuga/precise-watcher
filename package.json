@@ -1,0 +1,19 @@
+{
+  "private": true,
+  "name": "precise-watcher",
+  "version": "1.0.0-dev",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlexisPuga/precise-watcher.git"
+  },
+  "author": "AlexisPuga",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AlexisPuga/precise-watcher/issues"
+  },
+  "homepage": "https://github.com/AlexisPuga/precise-watcher#readme"
+}
