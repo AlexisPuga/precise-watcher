@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/AlexisPuga/precise-watcher/issues"
   },
-  "homepage": "https://github.com/AlexisPuga/precise-watcher#readme"
+  "homepage": "https://github.com/AlexisPuga/precise-watcher#readme",
+  "devDependencies": {
+    "standard": "*"
+  }
 }
