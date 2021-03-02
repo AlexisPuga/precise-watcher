@@ -1,0 +1,4 @@
+#!/usr/bin/env node
+const preciseWatcher = require('../src')
+
+preciseWatcher()
