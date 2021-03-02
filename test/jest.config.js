@@ -1,4 +1,5 @@
 module.exports = {
   runner: 'jest-runner-eslint',
-  displayName: 'ESLint'
+  displayName: 'ESLint',
+  watchPlugins: ['jest-runner-eslint/watch-fix']
 };
