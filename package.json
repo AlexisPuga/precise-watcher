@@ -3,6 +3,9 @@
   "name": "precise-watcher",
   "version": "1.0.0-dev",
   "main": "src/index.js",
+  "bin": {
+    "precise-watcher": "bin/cli"
+  },
   "scripts": {
     "test": "jest --passWithNoTests --config test/jest.config.js",
     "lint": "eslint .",
