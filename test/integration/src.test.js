@@ -1,6 +1,10 @@
 describe('/src', () => {
   const preciseWatcher = require('../../src')
 
+  beforeEach(() => {
+    jest.resetModules()
+  })
+
   it('Should read config from "precise-watcher" property located in ' +
     'users\' package.json, by default', async () => {
     // Should return early (returning false).
