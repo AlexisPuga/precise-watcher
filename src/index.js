@@ -2,6 +2,9 @@ const path = require('path')
 const chokidar = require('chokidar')
 const readConfig = require('./lib/read-config')
 const execAsync = require('./lib/exec-async')
+const log = console.log
+const logError = console.error
+let execCount = 0
 const handleEvent = (eventName, command, {
   baseDir = '.',
   regexp = /<file>/g,
@@ -17,12 +20,30 @@ const handleEvent = (eventName, command, {
   }
   const pathNthArg = pathNthArgs[eventName]
 
-  return async (...args) => {
+  return (...args) => {
     const pathArg = args[pathNthArg]
     const pathArgRelativeToBaseDir = path.relative(baseDir, pathArg)
     const cmd = command.replace(regexp, pathArgRelativeToBaseDir)
+    const id = execCount++
 
-    await execAsync(cmd, execAsyncOptions)
+    log(`[${id}] Running "${cmd}"`)
+    execAsync(cmd, execAsyncOptions).then(({ stdout, stderr }) => {
+      if (stderr) {
+        throw stderr
+      }
+
+      if (stdout) {
+        log(stdout)
+      }
+
+      return 0
+    }).catch((error) => {
+      logError(error)
+
+      return 1
+    }).then((status) => {
+      log(`[${id}] Exited with status ${status}`)
+    })
   }
 }
 

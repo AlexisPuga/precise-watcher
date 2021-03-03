@@ -32,6 +32,10 @@ describe('/src', () => {
     const destinationFile = path.join(process.cwd(), 'temp/test/', destinationFilename)
     let calls = 0
 
+    // @FIXME Disable logs
+    jest.spyOn(console, 'log').mockImplementation(() => {})
+    jest.spyOn(console, 'error').mockImplementation((error) => done(error))
+
     exec.mockImplementation((cmd, options) => {
       expect(cmd).toBe(`echo test/${destinationFilename}`)
       calls++
