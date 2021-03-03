@@ -28,11 +28,12 @@ describe('/src', () => {
   })
 
   it('Should read given sources', async (done) => {
-    const destinationFile = path.join(process.cwd(), 'test.temp')
+    const destinationFilename = 'test.temp'
+    const destinationFile = path.join(process.cwd(), destinationFilename)
     let calls = 0
 
     exec.mockImplementation((cmd, options) => {
-      expect(cmd).toBe(`echo ${destinationFile}`)
+      expect(cmd).toBe(`echo ${destinationFilename}`)
       calls++
 
       if (calls === 2) {

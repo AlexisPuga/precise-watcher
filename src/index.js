@@ -1,4 +1,3 @@
-const path = require('path')
 const chokidar = require('chokidar')
 const readConfig = require('./lib/read-config')
 const execAsync = require('./lib/exec-async')
@@ -47,12 +46,11 @@ module.exports = (options) => {
     sources.forEach((value) => {
       const { pattern, run, on, regexp, chokidar: localChokidarOptions } = Object(value)
       const chokidarOptions = {
+        cwd: userDirectory,
         ...globalChokidarOptions,
         ...localChokidarOptions
       }
-      const src = (Array.isArray(pattern) ? pattern : [pattern]).map(
-        (src) => path.join(userDirectory, src)
-      )
+      const src = Array.isArray(pattern) ? pattern : [pattern]
       const watcher = chokidar.watch(src, chokidarOptions)
       const eventNames = Array.isArray(on) ? on : [on]
 
