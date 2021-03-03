@@ -1,4 +1,4 @@
-const fs = require('fs')
+const fse = require('fs-extra')
 const path = require('path')
 const mockJson = (filepath, json) => jest.doMock(filepath, () => (json), {
   virtual: true
@@ -28,23 +28,24 @@ describe('/src', () => {
   })
 
   it('Should read given sources', async (done) => {
-    const destinationFilename = 'test.temp'
-    const destinationFile = path.join(process.cwd(), destinationFilename)
+    const destinationFilename = 'example'
+    const destinationFile = path.join(process.cwd(), 'temp/test/', destinationFilename)
     let calls = 0
 
     exec.mockImplementation((cmd, options) => {
-      expect(cmd).toBe(`echo ${destinationFilename}`)
+      expect(cmd).toBe(`echo test/${destinationFilename}`)
       calls++
 
       if (calls === 2) {
-        fs.unlinkSync(destinationFile)
+        fse.unlinkSync(destinationFile)
         done()
       }
     })
     mockJson('../../package.json', {
       'precise-watcher': {
         src: [{
-          pattern: '*.temp',
+          pattern: 'temp/**/*',
+          baseDir: 'temp',
           run: 'echo <file>',
           chokidar: { interval: 1 }
         }]
@@ -52,13 +53,13 @@ describe('/src', () => {
     })
 
     // Write initial file. This file shouldn't be handled by chokidar.
-    fs.writeFileSync(destinationFile, '1')
+    await fse.ensureFile(destinationFile)
 
     preciseWatcher()
 
     await wait(100)
-    fs.writeFileSync(destinationFile, '2')
+    await fse.writeFile(destinationFile, '1')
     await wait(100)
-    fs.writeFileSync(destinationFile, '3')
+    await fse.writeFile(destinationFile, '2')
   })
 })

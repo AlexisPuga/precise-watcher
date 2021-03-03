@@ -1,7 +1,9 @@
+const path = require('path')
 const chokidar = require('chokidar')
 const readConfig = require('./lib/read-config')
 const execAsync = require('./lib/exec-async')
 const handleEvent = (eventName, command, {
+  baseDir = '.',
   regexp = /<file>/g,
   cmd: execAsyncOptions
 }) => {
@@ -16,8 +18,9 @@ const handleEvent = (eventName, command, {
   const pathNthArg = pathNthArgs[eventName]
 
   return async (...args) => {
-    const path = args[pathNthArg]
-    const cmd = command.replace(regexp, path)
+    const pathArg = args[pathNthArg]
+    const pathArgRelativeToBaseDir = path.relative(baseDir, pathArg)
+    const cmd = command.replace(regexp, pathArgRelativeToBaseDir)
 
     await execAsync(cmd, execAsyncOptions)
   }
@@ -44,7 +47,7 @@ module.exports = (options) => {
     )
 
     sources.forEach((value) => {
-      const { pattern, run, on, regexp, chokidar: localChokidarOptions } = Object(value)
+      const { pattern, baseDir, run, on, regexp, chokidar: localChokidarOptions } = Object(value)
       const chokidarOptions = {
         cwd: userDirectory,
         ...globalChokidarOptions,
@@ -61,6 +64,7 @@ module.exports = (options) => {
 
         watcher.on(eventName, handleEvent(eventName, run, {
           regexp,
+          baseDir,
           cmd: { cwd: userDirectory }
         }))
       })
