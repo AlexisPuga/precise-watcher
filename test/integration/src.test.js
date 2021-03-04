@@ -39,7 +39,17 @@ describe('/src', () => {
   })
 
   it('Should read given sources', async () => {
-    runCmd.mockImplementation(() => Promise.resolve(0))
+    let order = 0
+
+    runCmd.mockImplementation(async (cmd, args) => {
+      if (cmd === 'sleep') {
+        const ms = parseFloat(args) * 1000
+
+        await wait(ms)
+      }
+
+      return ++order
+    })
     mockJson('../../package.json', {
       'precise-watcher': {
         src: [{
@@ -47,7 +57,11 @@ describe('/src', () => {
           baseDir: 'temp',
           run: [{
             cmd: 'sleep',
-            args: ['.15s']
+            args: ['.15s'],
+            callNext: 'parallel'
+          }, {
+            cmd: 'echo',
+            args: ['serial']
           }, {
             cmd: 'echo',
             args: ['<file>']
@@ -59,32 +73,22 @@ describe('/src', () => {
 
     preciseWatcher()
 
+    // Wait for the "ready" event:
     await wait(100)
     await fse.writeFile(testFile, '1')
-    await wait(100)
-    await fse.writeFile(testFile, '2')
-    await wait(100)
 
-    expect(runCmd).toHaveBeenCalledTimes(4)
-    expect(runCmd).toHaveBeenNthCalledWith(1, 'sleep', [
-      '.15s'
-    ], {
-      cwd: userDirectory
-    })
-    expect(runCmd).toHaveBeenNthCalledWith(2, 'echo', [
-      `test/${testFilename}`
-    ], {
-      cwd: userDirectory
-    })
-    expect(runCmd).toHaveBeenNthCalledWith(3, 'sleep', [
-      '.15s'
-    ], {
-      cwd: userDirectory
-    })
-    expect(runCmd).toHaveBeenNthCalledWith(4, 'echo', [
-      `test/${testFilename}`
-    ], {
-      cwd: userDirectory
-    })
+    // then, it gets queued in order:
+    expect(runCmd).toHaveBeenNthCalledWith(1, 'sleep', ['.15s'], { cwd: userDirectory })
+    expect(runCmd).toHaveBeenNthCalledWith(2, 'echo', ['serial'], { cwd: userDirectory })
+    expect(runCmd).toHaveBeenNthCalledWith(3, 'echo', [`test/${testFilename}`], { cwd: userDirectory })
+
+    // but, it gets called in disorder:
+    // 0 (call) -> 3 (order) -> first call was last.
+    expect(runCmd.mock.results[0].value).resolves.toBe(3)
+    expect(runCmd.mock.results[1].value).resolves.toBe(1)
+    expect(runCmd.mock.results[2].value).resolves.toBe(2)
+
+    // We get sure those commands were only the ones called:
+    expect(runCmd).toHaveBeenCalledTimes(3)
   })
 })

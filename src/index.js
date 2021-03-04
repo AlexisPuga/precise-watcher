@@ -26,6 +26,7 @@ const handleEvent = (eventName, commands, {
       if (i < commandsCount) {
         const { cmd, args: commandArgs, callNext = 'serial' } = commands[i]
         const serial = callNext === 'serial'
+        const parallel = callNext === 'parallel'
         const cmdArgs = commandArgs.map((cmdArg) => {
           if (cmdArg === '<file>') {
             const pathArg = args[pathNthArg]
@@ -44,6 +45,10 @@ const handleEvent = (eventName, commands, {
             next(commands, i + 1)
           }
         })
+
+        if (parallel) {
+          next(commands, i + 1)
+        }
       }
     })(commands, 0)
   }
