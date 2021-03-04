@@ -16,7 +16,11 @@ module.exports = async (cmd, args, options) => await new Promise((resolve, rejec
     logError(data.toString())
   })
 
+  child.on('error', (error) => {
+    reject(error)
+  })
+
   child.on('exit', (status) => {
-  	resolve(status)
+    resolve(status)
   })
 })
