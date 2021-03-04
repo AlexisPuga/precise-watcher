@@ -46,6 +46,9 @@ describe('/src', () => {
           pattern: 'temp/**/*',
           baseDir: 'temp',
           run: [{
+            cmd: 'sleep',
+            args: ['.15s']
+          }, {
             cmd: 'echo',
             args: ['<file>']
           }],
@@ -60,14 +63,25 @@ describe('/src', () => {
     await fse.writeFile(testFile, '1')
     await wait(100)
     await fse.writeFile(testFile, '2')
+    await wait(100)
 
-    expect(runCmd).toHaveBeenCalledTimes(2)
-    expect(runCmd).toHaveBeenNthCalledWith(1, 'echo', [
-      `test/${testFilename}`
+    expect(runCmd).toHaveBeenCalledTimes(4)
+    expect(runCmd).toHaveBeenNthCalledWith(1, 'sleep', [
+      '.15s'
     ], {
       cwd: userDirectory
     })
     expect(runCmd).toHaveBeenNthCalledWith(2, 'echo', [
+      `test/${testFilename}`
+    ], {
+      cwd: userDirectory
+    })
+    expect(runCmd).toHaveBeenNthCalledWith(3, 'sleep', [
+      '.15s'
+    ], {
+      cwd: userDirectory
+    })
+    expect(runCmd).toHaveBeenNthCalledWith(4, 'echo', [
       `test/${testFilename}`
     ], {
       cwd: userDirectory

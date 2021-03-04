@@ -24,7 +24,8 @@ const handleEvent = (eventName, commands, {
       const commandsCount = commands.length
 
       if (i < commandsCount) {
-        const { cmd, args: commandArgs } = commands[i]
+        const { cmd, args: commandArgs, callNext = 'serial' } = commands[i]
+        const serial = callNext === 'serial'
         const cmdArgs = commandArgs.map((cmdArg) => {
           if (cmdArg === '<file>') {
             const pathArg = args[pathNthArg]
@@ -39,7 +40,9 @@ const handleEvent = (eventName, commands, {
         runCmd(cmd, cmdArgs, cmdOptions).then((status) => {
           log(`${cmd} exited with status ${status}`)
 
-          next(commands, i + 1)
+          if (serial) {
+            next(commands, i + 1)
+          }
         })
       }
     })(commands, 0)
