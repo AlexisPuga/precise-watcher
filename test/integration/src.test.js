@@ -35,7 +35,7 @@ describe('/src', () => {
       'precise-watcher': {}
     })
 
-    expect(preciseWatcher()).toBe(true)
+    expect(preciseWatcher()).toMatchObject([])
   })
 
   it('Should read given sources', async () => {
@@ -76,6 +76,8 @@ describe('/src', () => {
     // Wait for the "ready" event:
     await wait(100)
     await fse.writeFile(testFile, '1')
+    // Wait for the "change" event:
+    await wait(100)
 
     // then, it gets queued in order:
     expect(runCmd).toHaveBeenNthCalledWith(1, 'sleep', ['.15s'], { cwd: userDirectory })

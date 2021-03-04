@@ -73,8 +73,7 @@ module.exports = (options) => {
     const sources = (Array.isArray(src) ? src : [src]).filter(
       (src) => Boolean(src)
     )
-
-    sources.forEach((value) => {
+    const watchers = sources.map((value) => {
       const { pattern, baseDir, run, on, regexp, chokidar: localChokidarOptions } = Object(value)
       const chokidarOptions = {
         cwd: userDirectory,
@@ -96,10 +95,12 @@ module.exports = (options) => {
           cmd: { cwd: userDirectory }
         }))
       })
+
+      return watcher
     })
 
-    return true
+    return watchers
   }
 
-  return false
+  return null
 }
