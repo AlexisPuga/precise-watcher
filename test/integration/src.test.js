@@ -14,9 +14,18 @@ jest.spyOn(console, 'error').mockImplementation(() => {})
 describe('/src', () => {
   const runCmd = require('../../src/lib/run-cmd')
   const preciseWatcher = require('../../src')
+  const userDirectory = process.cwd()
+  const testFilename = 'example'
+  const testFile = path.join(userDirectory, 'temp/test/', testFilename)
 
   beforeEach(() => {
     jest.resetModules()
+    // Write initial file. This file shouldn't be handled by chokidar.
+    fse.ensureFileSync(testFile)
+  })
+
+  afterEach(() => {
+    fse.unlinkSync(testFile)
   })
 
   it('Should read config from "precise-watcher" property located in ' +
@@ -30,12 +39,7 @@ describe('/src', () => {
   })
 
   it('Should read given sources', async () => {
-    const userDirectory = process.cwd()
-    const destinationFilename = 'example'
-    const destinationFile = path.join(userDirectory, 'temp/test/', destinationFilename)
-
     runCmd.mockImplementation(() => Promise.resolve(0))
-
     mockJson('../../package.json', {
       'precise-watcher': {
         src: [{
@@ -50,28 +54,23 @@ describe('/src', () => {
       }
     })
 
-    // Write initial file. This file shouldn't be handled by chokidar.
-    await fse.ensureFile(destinationFile)
-
     preciseWatcher()
 
     await wait(100)
-    await fse.writeFile(destinationFile, '1')
+    await fse.writeFile(testFile, '1')
     await wait(100)
-    await fse.writeFile(destinationFile, '2')
+    await fse.writeFile(testFile, '2')
 
     expect(runCmd).toHaveBeenCalledTimes(2)
     expect(runCmd).toHaveBeenNthCalledWith(1, 'echo', [
-      `test/${destinationFilename}`
+      `test/${testFilename}`
     ], {
       cwd: userDirectory
     })
     expect(runCmd).toHaveBeenNthCalledWith(2, 'echo', [
-      `test/${destinationFilename}`
+      `test/${testFilename}`
     ], {
       cwd: userDirectory
     })
-
-    fse.unlinkSync(destinationFile)
   })
 })
