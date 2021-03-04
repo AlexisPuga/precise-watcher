@@ -23,7 +23,7 @@ const handleEvent = (eventName, commands, {
       const commandsCount = commands.length
 
       if (i < commandsCount) {
-        const { cmd, args: commandArgs, callNext = 'serial' } = commands[i]
+        const { cmd, args: commandArgs = [], callNext = 'serial' } = commands[i]
         const serial = callNext === 'serial'
         const parallel = callNext === 'parallel'
         const cmdArgs = commandArgs.map((cmdArg) => {
