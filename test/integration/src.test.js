@@ -1,8 +1,6 @@
 const fse = require('fs-extra')
 const path = require('path')
-const mockJson = (filepath, json) => jest.doMock(filepath, () => (json), {
-  virtual: true
-})
+const mockJson = require('../lib/mock-json')
 const wait = async (ms) => new Promise((resolve) => {
   setTimeout(resolve, ms)
 })
