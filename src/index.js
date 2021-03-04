@@ -1,14 +1,13 @@
 const path = require('path')
 const chokidar = require('chokidar')
 const readConfig = require('./lib/read-config')
-const execAsync = require('./lib/exec-async')
+const runCmd = require('./lib/run-cmd')
 const log = console.log
 const logError = console.error
-let execCount = 0
-const handleEvent = (eventName, command, {
+const handleEvent = (eventName, commands, {
   baseDir = '.',
   regexp = /<file>/g,
-  cmd: execAsyncOptions
+  cmd: cmdOptions
 }) => {
   const pathNthArgs = {
     add: 0,
@@ -21,29 +20,29 @@ const handleEvent = (eventName, command, {
   const pathNthArg = pathNthArgs[eventName]
 
   return (...args) => {
-    const pathArg = args[pathNthArg]
-    const pathArgRelativeToBaseDir = path.relative(baseDir, pathArg)
-    const cmd = command.replace(regexp, pathArgRelativeToBaseDir)
-    const id = execCount++
+    (function next (commands, i) {
+      const commandsCount = commands.length
 
-    log(`[${id}] Running "${cmd}"`)
-    execAsync(cmd, execAsyncOptions).then(({ stdout, stderr }) => {
-      if (stderr) {
-        throw stderr
+      if (i < commandsCount) {
+        const { cmd, args: commandArgs } = commands[i]
+        const cmdArgs = commandArgs.map((cmdArg) => {
+          if (cmdArg === '<file>') {
+            const pathArg = args[pathNthArg]
+            const pathArgRelativeToBaseDir = path.relative(baseDir, pathArg)
+
+            return pathArgRelativeToBaseDir
+          }
+
+          return cmdArg
+        })
+
+        runCmd(cmd, cmdArgs, cmdOptions).then((status) => {
+          log(`${cmd} exited with status ${status}`)
+
+          next(commands, i + 1)
+        })
       }
-
-      if (stdout) {
-        log(stdout)
-      }
-
-      return 0
-    }).catch((error) => {
-      logError(error)
-
-      return 1
-    }).then((status) => {
-      log(`[${id}] Exited with status ${status}`)
-    })
+    })(commands, 0)
   }
 }
 

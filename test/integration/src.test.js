@@ -7,10 +7,12 @@ const wait = async (ms) => new Promise((resolve) => {
   setTimeout(resolve, ms)
 })
 
-jest.mock('child_process')
+jest.mock('../../src/lib/run-cmd')
+jest.spyOn(console, 'log').mockImplementation(() => {})
+jest.spyOn(console, 'error').mockImplementation(() => {})
 
 describe('/src', () => {
-  const { exec } = require('child_process')
+  const runCmd = require('../../src/lib/run-cmd')
   const preciseWatcher = require('../../src')
 
   beforeEach(() => {
@@ -27,30 +29,22 @@ describe('/src', () => {
     expect(preciseWatcher()).toBe(true)
   })
 
-  it('Should read given sources', async (done) => {
+  it('Should read given sources', async () => {
+    const userDirectory = process.cwd()
     const destinationFilename = 'example'
-    const destinationFile = path.join(process.cwd(), 'temp/test/', destinationFilename)
-    let calls = 0
+    const destinationFile = path.join(userDirectory, 'temp/test/', destinationFilename)
 
-    // @FIXME Disable logs
-    jest.spyOn(console, 'log').mockImplementation(() => {})
-    jest.spyOn(console, 'error').mockImplementation((error) => done(error))
+    runCmd.mockImplementation(() => Promise.resolve(0))
 
-    exec.mockImplementation((cmd, options) => {
-      expect(cmd).toBe(`echo test/${destinationFilename}`)
-      calls++
-
-      if (calls === 2) {
-        fse.unlinkSync(destinationFile)
-        done()
-      }
-    })
     mockJson('../../package.json', {
       'precise-watcher': {
         src: [{
           pattern: 'temp/**/*',
           baseDir: 'temp',
-          run: 'echo <file>',
+          run: [{
+            cmd: 'echo',
+            args: ['<file>']
+          }],
           chokidar: { interval: 1 }
         }]
       }
@@ -65,5 +59,19 @@ describe('/src', () => {
     await fse.writeFile(destinationFile, '1')
     await wait(100)
     await fse.writeFile(destinationFile, '2')
+
+    expect(runCmd).toHaveBeenCalledTimes(2)
+    expect(runCmd).toHaveBeenNthCalledWith(1, 'echo', [
+      `test/${destinationFilename}`
+    ], {
+      cwd: userDirectory
+    })
+    expect(runCmd).toHaveBeenNthCalledWith(2, 'echo', [
+      `test/${destinationFilename}`
+    ], {
+      cwd: userDirectory
+    })
+
+    fse.unlinkSync(destinationFile)
   })
 })
