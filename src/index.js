@@ -3,7 +3,6 @@ const chokidar = require('chokidar')
 const readConfig = require('./lib/read-config')
 const runCmd = require('./lib/run-cmd')
 const log = console.log
-const logError = console.error
 const handleEvent = (eventName, commands, {
   baseDir = '.',
   regexp = /<file>/g,
