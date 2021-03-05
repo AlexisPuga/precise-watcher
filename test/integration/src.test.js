@@ -30,15 +30,18 @@ describe('/src', () => {
 
   it('Should read config from "precise-watcher" property located in ' +
     'users\' package.json, by default', async () => {
+    const { start } = preciseWatcher
+
     // Should return early (returning false).
     mockJson('../../package.json', {
       'precise-watcher': {}
     })
 
-    expect(preciseWatcher()).toMatchObject([])
+    expect(start()).toMatchObject([])
   })
 
   it('Should read given sources', async (done) => {
+    const { start } = preciseWatcher
     let order = 0
 
     runCmd.mockImplementation(async (cmd, args) => {
@@ -70,7 +73,7 @@ describe('/src', () => {
       }
     })
 
-    const [ watcher ] = preciseWatcher()
+    const [ watcher ] = start()
 
     watcher.on('ready', async () => {
       await fse.writeFile(testFile, '1')

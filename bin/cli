@@ -1,4 +1,4 @@
 #!/usr/bin/env node
-const preciseWatcher = require('../src')
+const { start } = require('../src')
 
-preciseWatcher()
+start()
