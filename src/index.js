@@ -19,7 +19,7 @@ const handleEvent = (eventName, commands, {
   const pathNthArg = pathNthArgs[eventName]
 
   return (...args) => {
-    (function next (commands, i) {
+    (async function next (commands, i) {
       const commandsCount = commands.length
 
       if (i < commandsCount) {
@@ -37,11 +37,11 @@ const handleEvent = (eventName, commands, {
           return cmdArg
         })
 
-        runCmd(cmd, cmdArgs, cmdOptions).then((status) => {
+        runCmd(cmd, cmdArgs, cmdOptions).then(async (status) => {
           log(`${cmd} exited with status ${status}`)
 
           if (serial) {
-            next(commands, i + 1)
+            await next(commands, i + 1)
           }
         })
 

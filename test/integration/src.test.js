@@ -38,7 +38,7 @@ describe('/src', () => {
     expect(preciseWatcher()).toMatchObject([])
   })
 
-  it('Should read given sources', async () => {
+  it('Should read given sources', async (done) => {
     let order = 0
 
     runCmd.mockImplementation(async (cmd, args) => {
@@ -65,32 +65,31 @@ describe('/src', () => {
           }, {
             cmd: 'echo',
             args: ['<file>']
-          }],
-          chokidar: { interval: 1 }
+          }]
         }]
       }
     })
 
-    preciseWatcher()
+    const [ watcher ] = preciseWatcher()
 
-    // Wait for the "ready" event:
-    await wait(100)
-    await fse.writeFile(testFile, '1')
-    // Wait for the "change" event:
-    await wait(100)
+    watcher.on('ready', async () => {
+      await fse.writeFile(testFile, '1')
 
-    // then, it gets queued in order:
-    expect(runCmd).toHaveBeenNthCalledWith(1, 'sleep', ['.15s'], { cwd: userDirectory })
-    expect(runCmd).toHaveBeenNthCalledWith(2, 'echo', ['serial'], { cwd: userDirectory })
-    expect(runCmd).toHaveBeenNthCalledWith(3, 'echo', [`test/${testFilename}`], { cwd: userDirectory })
+      // We get sure those commands were only the ones called:
+      expect(runCmd).toHaveBeenCalledTimes(3)
 
-    // but, it gets called in disorder:
-    // 0 (call) -> 3 (order) -> first call was last.
-    expect(runCmd.mock.results[0].value).resolves.toBe(3)
-    expect(runCmd.mock.results[1].value).resolves.toBe(1)
-    expect(runCmd.mock.results[2].value).resolves.toBe(2)
+      // then, it gets queued in order:
+      expect(runCmd).toHaveBeenNthCalledWith(1, 'sleep', ['.15s'], { cwd: userDirectory })
+      expect(runCmd).toHaveBeenNthCalledWith(2, 'echo', ['serial'], { cwd: userDirectory })
+      expect(runCmd).toHaveBeenNthCalledWith(3, 'echo', [`test/${testFilename}`], { cwd: userDirectory })
 
-    // We get sure those commands were only the ones called:
-    expect(runCmd).toHaveBeenCalledTimes(3)
+      // but, it gets called in disorder:
+      // 0 (call) -> 3 (order) -> first call was last.
+      expect(runCmd.mock.results[0].value).resolves.toBe(3)
+      expect(runCmd.mock.results[1].value).resolves.toBe(1)
+      expect(runCmd.mock.results[2].value).resolves.toBe(2)
+
+      done()
+    })
   })
 })
