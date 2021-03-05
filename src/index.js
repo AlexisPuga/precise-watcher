@@ -5,7 +5,6 @@ const runCmd = require('./lib/run-cmd')
 const log = console.log
 const handleEvent = (eventName, commands, {
   baseDir = '.',
-  regexp = /<file>/g,
   cmd: cmdOptions
 }) => {
   const pathNthArgs = {
@@ -73,7 +72,7 @@ module.exports = (options) => {
       (src) => Boolean(src)
     )
     const watchers = sources.map((value) => {
-      const { pattern, baseDir, run, on, regexp, chokidar: localChokidarOptions } = Object(value)
+      const { pattern, baseDir, run, on, chokidar: localChokidarOptions } = Object(value)
       const chokidarOptions = {
         cwd: userDirectory,
         ...globalChokidarOptions,
@@ -89,7 +88,6 @@ module.exports = (options) => {
         }
 
         watcher.on(eventName, handleEvent(eventName, run, {
-          regexp,
           baseDir,
           cmd: { cwd: userDirectory }
         }))
