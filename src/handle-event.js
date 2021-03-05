@@ -17,11 +17,11 @@ module.exports = (eventName, commands, {
   const pathNthArg = pathNthArgs[eventName]
 
   return (...args) => {
-    (async function next (commands, i) {
-      const commandsCount = commands.length
+    (async function next (commands) {
+      const command = commands.shift()
 
-      if (i < commandsCount) {
-        const { cmd, args: commandArgs = [], callNext = 'serial' } = commands[i]
+      if (command) {
+        const { cmd, args: commandArgs = [], callNext = 'serial' } = command
         const serial = callNext === 'serial'
         const parallel = callNext === 'parallel'
         const cmdArgs = commandArgs.map((cmdArg) => {
@@ -39,14 +39,14 @@ module.exports = (eventName, commands, {
           log(`${cmd} exited with status ${status}`)
 
           if (serial) {
-            await next(commands, i + 1)
+            await next(commands)
           }
         })
 
         if (parallel) {
-          next(commands, i + 1)
+          next(commands)
         }
       }
-    })(commands, 0)
+    })(commands)
   }
 }
