@@ -6,12 +6,7 @@ const allWatchers = []
 const handleShutdown = () => {
   shutdown(allWatchers)
 }
-const handleSignal = () => {
-  process.exitCode = 0
-}
 
-process.on('SIGINT', handleSignal)
-process.on('SIGTERM', handleSignal)
 process.on('exit', handleShutdown)
 
 module.exports = (options) => {
