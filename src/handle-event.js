@@ -1,6 +1,7 @@
 const path = require('path')
 const runCmd = require('./lib/run-cmd')
 const log = console.log
+const logError = console.error
 const pathNthArgs = {
   add: 0,
   change: 0,
@@ -16,8 +17,8 @@ module.exports = (eventName, commands, {
 }) => {
   const pathNthArg = pathNthArgs[eventName]
 
-  return (...args) => {
-    (async function next (commands) {
+  return async (...args) => {
+    const next = async (commands) => await new Promise((resolve, reject) => {
       const command = commands.shift()
 
       if (command) {
@@ -41,12 +42,25 @@ module.exports = (eventName, commands, {
           if (serial) {
             await next(commands)
           }
-        })
+        }).catch(reject)
 
         if (parallel) {
-          next(commands)
+          next(commands).catch(reject)
         }
+
+        if (!serial && !parallel) {
+          reject(new TypeError(`src.callNext value (${callNext}) is invalid.`))
+        }
+      } else {
+        resolve()
       }
-    })(commands)
+    })
+
+    try {
+      await next(commands)
+    } catch (exception) {
+      logError(exception)
+      process.exitCode = 1
+    }
   }
 }
