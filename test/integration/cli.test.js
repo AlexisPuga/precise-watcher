@@ -7,6 +7,6 @@ describe('precise-watcher', () => {
     const { stderr, stdout } = await execFileAsync('bin/cli')
 
     expect(stderr).toBe('')
-    expect(stdout).toBe('')
+    expect(stdout).toBe('Stopping precise-watcher...\n')
   })
 })
