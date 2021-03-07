@@ -11,7 +11,7 @@ process.on('SIGTERM', handleSignal)
 
 const { argv } = yargs(hideBin(process.argv))
   .usage('Usage: $0 [command] [...options]')
-  .command('$0', 'Start watching files. Default.', {
+  .command(['$0', 'start'], 'Start watching files. Default.', {
     cwd: {
       defaults: 'process.cwd()',
       describe: 'Directory for chokidar, config file, and your commands.'

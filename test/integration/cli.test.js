@@ -3,8 +3,11 @@ const { execFile } = require('child_process')
 const execFileAsync = promisify(execFile)
 
 describe('precise-watcher', () => {
-  it('Should work with defaults', async () => {
-    const { stderr, stdout } = await execFileAsync('bin/cli')
+  test.each([
+    ['default'],
+    ['"start"', ['start']]
+  ])('Should work with defaults using the %s command.', async ($0, args) => {
+    const { stderr, stdout } = await execFileAsync('bin/cli', args)
 
     expect(stderr).toBe('')
     expect(stdout).toBe('Stopping precise-watcher...\n')
