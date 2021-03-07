@@ -3,7 +3,7 @@ const yargs = require('yargs/yargs')
 const { hideBin } = require('yargs/helpers')
 const { start } = require('../src')
 const handleSignal = () => {
-  process.exitCode = 0
+  process.exit(0)
 }
 
 process.on('SIGINT', handleSignal)
