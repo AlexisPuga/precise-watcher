@@ -90,7 +90,7 @@ Option   | Defaults      | Description
 ### Watch files using js
 Should be as easy as:
 ``` js
-const { start, stop } = require('precise-watcher')
+const { start, stop, shutdown } = require('precise-watcher')
 // Returns an array of chokidar.watch() instances:
 const watchers = start()
 
@@ -98,6 +98,8 @@ const watchers = start()
 stop(watchers)
 // To remove all watchers:
 stop()
+// To exit:
+shutdown()
 ```
 
 ## Examples
