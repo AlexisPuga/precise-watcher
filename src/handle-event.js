@@ -19,8 +19,8 @@ module.exports = (eventName, commands, {
   const pathNthArg = pathNthArgs[eventName]
 
   return async (...args) => {
-    const next = async (commands) => await new Promise((resolve, reject) => {
-      const command = commands.shift()
+    const next = async (commands, i) => await new Promise((resolve, reject) => {
+      const command = commands[i]
 
       if (command) {
         const { cmd, args: commandArgs = [], callNext = 'serial' } = command
@@ -42,7 +42,7 @@ module.exports = (eventName, commands, {
 
           if (serial) {
             debug('Calling next command in serial...')
-            await next(commands)
+            await next(commands, i + 1)
           } else {
             debug('Skipping "serial" call.')
           }
@@ -50,7 +50,7 @@ module.exports = (eventName, commands, {
 
         if (parallel) {
           debug('Calling next command in parallel...')
-          next(commands).catch(reject)
+          next(commands, i + 1).catch(reject)
         }
 
         if (!serial && !parallel) {
@@ -64,7 +64,7 @@ module.exports = (eventName, commands, {
 
     try {
       debug('Running commands...')
-      await next(commands)
+      await next(commands, 0)
     } catch (exception) {
       logError(exception)
       process.exitCode = 1
