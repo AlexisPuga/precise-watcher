@@ -6,7 +6,11 @@ const mockJson = (filepath, json) => jest.doMock(filepath, () => (json), {
 const wait = async (ms) => new Promise((resolve) => {
   setTimeout(resolve, ms)
 })
+const mockDebugFn = jest.fn()
 
+jest.mock('debug', () => {
+  return jest.fn().mockImplementation(() => mockDebugFn)
+})
 jest.mock('../../src/lib/run-cmd')
 jest.spyOn(console, 'log').mockImplementation(() => {})
 jest.spyOn(console, 'error').mockImplementation(() => {})
@@ -94,5 +98,15 @@ describe('/src', () => {
 
       done()
     })
+  })
+
+  it('Should read package.json from any location.', () => {
+    const { start } = preciseWatcher
+
+    start({
+      config: 'test/fixtures/package.json'
+    })
+
+    expect(mockDebugFn).toHaveBeenCalledWith('Reading "precise-watcher" property from package.json.')
   })
 })

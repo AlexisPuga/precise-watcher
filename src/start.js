@@ -15,13 +15,14 @@ process.on('exit', handleShutdown)
 module.exports = (options) => {
   const {
     cwd: userDirectory = process.cwd(),
-    config: configFilename = 'package.json'
+    config: configFile = 'package.json'
   } = Object(options)
+  const configFilename = path.basename(configFile)
   debug(`Setting cwd to ${userDirectory}.`)
-  debug(`Setting config to ${configFilename}.`)
+  debug(`Setting config to ${configFile}.`)
 
-  debug(`Reading ${path.join(userDirectory, configFilename)}.`)
-  let config = readConfig(configFilename, {
+  debug(`Reading ${path.join(userDirectory, configFile)}.`)
+  let config = readConfig(configFile, {
     cwd: userDirectory
   })
 
