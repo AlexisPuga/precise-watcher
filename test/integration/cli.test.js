@@ -45,4 +45,11 @@ describe('precise-watcher', () => {
       'Stopping precise-watcher...'
     ].join('\n') + '\n')
   })
+
+  it('Should handle the "stop" command.', async () => {
+    const { stdout, stderr } = await execFileAsync('bin/cli', ['stop'])
+
+    expect(stderr).toBe('')
+    expect(stdout).toBe('Stopping precise-watcher...\n')
+  })
 })

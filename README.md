@@ -94,8 +94,10 @@ const { start, stop } = require('precise-watcher')
 // Returns an array of chokidar.watch() instances:
 const watchers = start()
 
-// To remove watchers:
-stop(watchers) // ... or just wait for the "exit" event (https://nodejs.org/api/process.html#process_event_exit) to happen.
+// To remove some watchers:
+stop(watchers)
+// To remove all watchers:
+stop()
 ```
 
 ## Examples

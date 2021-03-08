@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 const yargs = require('yargs/yargs')
 const { hideBin } = require('yargs/helpers')
-const { start } = require('../src')
+const { start, stop, shutdown } = require('../src')
 const log = console.log
 const handleSignal = () => {
   process.exit(0)
@@ -22,6 +22,9 @@ const { argv } = yargs(hideBin(process.argv))
       describe: 'Path to your config. file, relative to --cwd.'
     }
   }, (argv) => {
+    process.on('exit', () => shutdown())
+
     log('Starting precise-watcher...')
     start(argv)
   })
+  .command('stop', 'Stop watching files.', {}, () => stop())
