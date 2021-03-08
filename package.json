@@ -29,7 +29,10 @@
     "type": "git",
     "url": "git+https://github.com/AlexisPuga/precise-watcher.git"
   },
-  "author": "AlexisPuga",
+  "author": {
+    "name": "Alexis Puga",
+    "url": "https://github.com/AlexisPuga"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/AlexisPuga/precise-watcher/issues"
