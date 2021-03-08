@@ -1,6 +1,9 @@
 # Precise Watcher
 [![JavaScript Style Guide](https://cdn.rawgit.com/standard/standard/master/badge.svg)](https://github.com/standard/standard)
 
+## Status
+![Cross OS CI](https://github.com/AlexisPuga/precise-watcher/workflows/Cross%20OS%20CI/badge.svg)
+
 ## Usage
 Using `precise-watcher` is as simple as adding the following to your `package.json` and running `npm run watch`:
 ``` js
