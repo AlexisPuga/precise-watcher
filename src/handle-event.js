@@ -27,15 +27,13 @@ module.exports = (eventName, commands, {
         const serial = callNext === 'serial'
         const parallel = callNext === 'parallel'
         const cmdArgs = commandArgs.map((cmdArg) => {
-          if (cmdArg === '<file>') {
+          return cmdArg.replace(/<file>/g, () => {
             const pathArg = args[pathNthArg]
             const pathArgRelativeToBaseDir = path.relative(baseDir, pathArg)
 
             debug(`Replacing <file> with ${pathArgRelativeToBaseDir}`)
             return pathArgRelativeToBaseDir
-          }
-
-          return cmdArg
+          })
         })
 
         debug(`Running ${cmd}, args: ${JSON.stringify(cmdArgs)}, options: ${JSON.stringify(cmdOptions)}.`)
