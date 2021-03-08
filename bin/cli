@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+const yargs = require('yargs/yargs')
+const { hideBin } = require('yargs/helpers')
 const { start } = require('../src')
 const handleSignal = () => {
   process.exitCode = 0
@@ -7,4 +9,15 @@ const handleSignal = () => {
 process.on('SIGINT', handleSignal)
 process.on('SIGTERM', handleSignal)
 
-start()
+const { argv } = yargs(hideBin(process.argv))
+  .usage('Usage: $0 [command] [...options]')
+  .command('$0', 'Start watching files. Default.', {
+    cwd: {
+      defaults: 'process.cwd()',
+      describe: 'Directory for chokidar, config file, and your commands.'
+    },
+    config: {
+      defaults: 'package.json',
+      describe: 'Path to your config. file, relative to --cwd.'
+    }
+  }, start)
