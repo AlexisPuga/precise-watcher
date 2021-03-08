@@ -1,6 +1,17 @@
 {
   "private": true,
   "name": "precise-watcher",
+  "title": "Precise Watcher",
+  "description": "Watch files the precise way.",
+  "keywords": [
+    "watch files",
+    "run commands on watched file",
+    "watch files in NPM script",
+    "file watcher",
+    "dev tool",
+    "chokidar wrapper",
+    "CLI tool"
+  ],
   "version": "1.0.0-dev",
   "main": "src/index.js",
   "bin": {
