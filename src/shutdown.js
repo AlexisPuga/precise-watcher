@@ -1,13 +1,11 @@
-const debug = require('debug')('precise-watcher')
 const stop = require('./stop')
 const logError = console.error
 
 module.exports = () => {
   stop().then(() => {
-    debug('Setting process.exitCode to 0.')
-    process.exitCode = 0
+    process.exit(0)
   }).catch((error) => {
     logError(error)
-    process.exitCode = 1
+    process.exit(1)
   })
 }
