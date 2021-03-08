@@ -214,3 +214,5 @@ If you need more inspiration, you can check out these examples:
   }]
 }
 ```
+## License
+This project is <a href='https://github.com/AlexisPuga/precise-watcher/blob/master/LICENSE'>MIT Licensed</a>.
