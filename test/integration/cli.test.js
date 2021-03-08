@@ -10,7 +10,10 @@ describe('precise-watcher', () => {
     const { stderr, stdout } = await execFileAsync('bin/cli', args)
 
     expect(stderr).toBe('')
-    expect(stdout).toBe('Stopping precise-watcher...\n')
+    expect(stdout).toBe([
+      'Starting precise-watcher...',
+      'Stopping precise-watcher...'
+    ].join('\n') + '\n')
   })
 
   test.each([
@@ -28,6 +31,7 @@ describe('precise-watcher', () => {
 
     expect(stderr).toBe('')
     expect(stdout).toBe([
+      'Starting precise-watcher...',
       'Stopping precise-watcher...'
     ].join('\n') + '\n')
   })
