@@ -1,4 +1,5 @@
 const path = require('path')
+const debug = require('debug')('precise-watcher')
 const runCmd = require('./lib/run-cmd')
 const log = console.log
 const logError = console.error
@@ -30,21 +31,27 @@ module.exports = (eventName, commands, {
             const pathArg = args[pathNthArg]
             const pathArgRelativeToBaseDir = path.relative(baseDir, pathArg)
 
+            debug(`Replacing <file> with ${pathArgRelativeToBaseDir}`)
             return pathArgRelativeToBaseDir
           }
 
           return cmdArg
         })
 
+        debug(`Running ${cmd}, args: ${JSON.stringify(cmdArgs)}, options: ${JSON.stringify(cmdOptions)}.`)
         runCmd(cmd, cmdArgs, cmdOptions).then(async (status) => {
           log(`${cmd} exited with status ${status}`)
 
           if (serial) {
+            debug('Calling next command in serial...')
             await next(commands)
+          } else {
+            debug('Skipping "serial" call.')
           }
         }).catch(reject)
 
         if (parallel) {
+          debug('Calling next command in parallel...')
           next(commands).catch(reject)
         }
 
@@ -52,11 +59,13 @@ module.exports = (eventName, commands, {
           reject(new TypeError(`src.callNext value (${callNext}) is invalid.`))
         }
       } else {
+        debug('No commands found. Resolving...')
         resolve()
       }
     })
 
     try {
+      debug('Running commands...')
       await next(commands)
     } catch (exception) {
       logError(exception)
