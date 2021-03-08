@@ -14,6 +14,10 @@
   "publishConfig": {
     "access": "public"
   },
+  "files": [
+    "src",
+    "bin"
+  ],
   "version": "1.0.0-dev",
   "main": "src/index.js",
   "bin": {
