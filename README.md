@@ -214,5 +214,8 @@ If you need more inspiration, you can check out these examples:
   }]
 }
 ```
+## Credits
+Thanks to <a href='https://github.com/paulmillr/chokidar'>Chokidar</a>'s author and contributors and this project's contributors.
+
 ## License
 This project is <a href='https://github.com/AlexisPuga/precise-watcher/blob/master/LICENSE'>MIT Licensed</a>.
