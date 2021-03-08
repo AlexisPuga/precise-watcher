@@ -45,7 +45,7 @@ describe('/src', () => {
     expect(mockDebugFn).toHaveBeenCalledWith('Reading "precise-watcher" property from package.json.')
   })
 
-  it('Should read given sources', async (done) => {
+  it('Should read given sources', async () => new Promise((resolve) => {
     const { start } = preciseWatcher
     let order = 0
 
@@ -56,7 +56,16 @@ describe('/src', () => {
         await wait(ms)
       }
 
-      return ++order
+      order++
+
+      const calls = order
+      const cmdCount = 3
+
+      if (calls === cmdCount) {
+        resolve()
+      }
+
+      return order
     })
     mockJson('../../package.json', {
       'precise-watcher': {
@@ -82,24 +91,19 @@ describe('/src', () => {
 
     watcher.on('ready', async () => {
       await fse.writeFile(testFile, '1')
-
-      // We get sure those commands were only the ones called:
-      expect(runCmd).toHaveBeenCalledTimes(3)
-
-      // then, it gets queued in order:
-      expect(runCmd).toHaveBeenNthCalledWith(1, 'sleep', ['.15s'], { cwd: userDirectory })
-      expect(runCmd).toHaveBeenNthCalledWith(2, 'echo', ['serial'], { cwd: userDirectory })
-      expect(runCmd).toHaveBeenNthCalledWith(3, 'echo', [`test/${testFilename}`], { cwd: userDirectory })
-
-      // but, it gets called in disorder:
-      // 0 (call) -> 3 (order) -> first call was last.
-      expect(runCmd.mock.results[0].value).resolves.toBe(3)
-      expect(runCmd.mock.results[1].value).resolves.toBe(1)
-      expect(runCmd.mock.results[2].value).resolves.toBe(2)
-
-      done()
     })
-  })
+  }).then(() => {
+    // then, it gets queued in order:
+    expect(runCmd).toHaveBeenNthCalledWith(1, 'sleep', ['.15s'], { cwd: userDirectory })
+    expect(runCmd).toHaveBeenNthCalledWith(2, 'echo', ['serial'], { cwd: userDirectory })
+    expect(runCmd).toHaveBeenNthCalledWith(3, 'echo', [`test/${testFilename}`], { cwd: userDirectory })
+
+    // but, it gets called in disorder:
+    // 0 (call) -> 3 (order) -> first call was last.
+    expect(runCmd.mock.results[0].value).resolves.toBe(3)
+    expect(runCmd.mock.results[1].value).resolves.toBe(1)
+    expect(runCmd.mock.results[2].value).resolves.toBe(2)
+  }))
 
   it('Should read package.json from any location.', () => {
     const { start } = preciseWatcher

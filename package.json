@@ -7,7 +7,7 @@
     "precise-watcher": "bin/cli"
   },
   "scripts": {
-    "test": "jest --passWithNoTests --config jest.config.js",
+    "test": "jest --passWithNoTests --config jest.config.js --forceExit",
     "lint": "eslint .",
     "watch": "npm test -- --watch",
     "dev": "npm run watch"
