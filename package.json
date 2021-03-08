@@ -1,5 +1,4 @@
 {
-  "private": true,
   "name": "precise-watcher",
   "title": "Precise Watcher",
   "description": "Watch files the precise way.",
@@ -12,6 +11,9 @@
     "chokidar wrapper",
     "CLI tool"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "1.0.0-dev",
   "main": "src/index.js",
   "bin": {
