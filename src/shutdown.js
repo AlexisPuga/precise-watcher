@@ -1,9 +1,10 @@
 const debug = require('debug')('precise-watcher')
+const allWatchers = require('./watchers')
 const stop = require('./stop')
-const allWatchers = []
 const log = console.log
 const logError = console.error
-const handleShutdown = (watchers) => {
+
+module.exports = (watchers) => {
   log('Stopping precise-watcher...')
 
   if (!watchers) {
@@ -18,9 +19,4 @@ const handleShutdown = (watchers) => {
     logError(error)
     process.exitCode = 1
   })
-}
-
-module.exports = {
-  allWatchers,
-  run: handleShutdown
 }
