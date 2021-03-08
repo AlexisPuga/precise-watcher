@@ -6,6 +6,11 @@ const logError = console.error
 const handleShutdown = (watchers) => {
   log('Stopping precise-watcher...')
 
+  if (!watchers) {
+    debug('Removing all watchers.')
+    watchers = allWatchers
+  }
+
   stop(watchers).then(() => {
     debug('Setting process.exitCode to 0.')
     process.exitCode = 0
