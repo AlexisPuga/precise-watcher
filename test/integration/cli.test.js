@@ -1,3 +1,4 @@
+const path = require('path')
 const { promisify } = require('util')
 const { execFile } = require('child_process')
 const execFileAsync = promisify(execFile)
@@ -20,16 +21,25 @@ describe('precise-watcher', () => {
     [[]],
     [['start']]
   ])('Should handle all known options.', async (args) => {
+    const cwd = __dirname
+    const config = '../fixtures/precise-watcher.config.js'
+
     const { stderr, stdout } = await execFileAsync('bin/cli', args.concat([
       '--cwd',
-      __dirname,
+      cwd,
       '--config',
-      '../fixtures/precise-watcher.config.js'
-    ]))
+      config
+    ]), {
+      env: {
+        ...process.env,
+        DEBUG: 'precise-watcher'
+      }
+    })
 
-    // @TODO Test debugging.
-
-    expect(stderr).toBe('')
+    // The "debug" internal module sends the output via stderr.
+    expect(stderr).toMatch(`Setting cwd to ${cwd}`)
+    expect(stderr).toMatch(`Setting config to ${config}`)
+    expect(stderr).toMatch(`Reading ${path.join(cwd, config)}`)
     expect(stdout).toBe([
       'Starting precise-watcher...',
       'Stopping precise-watcher...'
