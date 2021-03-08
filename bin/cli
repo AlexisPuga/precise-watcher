@@ -22,7 +22,7 @@ const { argv } = yargs(hideBin(process.argv))
       describe: 'Path to your config. file, relative to --cwd.'
     }
   }, (argv) => {
-    process.on('exit', () => shutdown())
+    process.on('exit', shutdown)
 
     log('Starting precise-watcher...')
     start(argv)
