@@ -42,6 +42,7 @@ describe('/src', () => {
     })
 
     expect(start()).toMatchObject([])
+    expect(mockDebugFn).toHaveBeenCalledWith('Reading "precise-watcher" property from package.json.')
   })
 
   it('Should read given sources', async (done) => {
