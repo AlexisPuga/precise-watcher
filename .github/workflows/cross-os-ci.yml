@@ -1,0 +1,28 @@
+# This workflow will do a clean install of node dependencies and run tests across different OS (ubuntu and macOS).
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Cross OS CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  test:
+
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest]
+
+    runs-on: ${{ matrix.platform }}
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use ${{ matrix.platform }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: 14
+    - run: npm ci
+    - run: npm test -- --ci
