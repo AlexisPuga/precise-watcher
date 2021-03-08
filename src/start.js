@@ -3,12 +3,10 @@ const debug = require('debug')('precise-watcher')
 const chokidar = require('chokidar')
 const readConfig = require('./lib/read-config')
 const handleEvent = require('./handle-event')
-const shutdown = require('./shutdown')
-const allWatchers = []
-const handleShutdown = () => {
-  debug('Exiting from precise-watcher...')
-  shutdown(allWatchers)
-}
+const {
+  chokidarWatchers: allWatchers,
+  run: handleShutdown
+} = require('./handle-shutdown')
 
 process.on('exit', handleShutdown)
 
