@@ -4,11 +4,11 @@ const chokidar = require('chokidar')
 const readConfig = require('./lib/read-config')
 const handleEvent = require('./handle-event')
 const {
-  chokidarWatchers: allWatchers,
-  run: handleShutdown
-} = require('./handle-shutdown')
+  allWatchers,
+  run: shutdown
+} = require('./shutdown')
 
-process.on('exit', handleShutdown)
+process.on('exit', () => shutdown())
 
 module.exports = (options) => {
   const {
