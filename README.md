@@ -1,5 +1,9 @@
-# Precise Watcher
-[![JavaScript Style Guide](https://cdn.rawgit.com/standard/standard/master/badge.svg)](https://github.com/standard/standard)
+<p align='right'><a href='https://github.com/standard/standard'><img src='https://cdn.rawgit.com/standard/standard/master/badge.svg' alt='JavaScript Style Guide'/></a></p>
+<hr>
+<h1 align='left'>Precise Watcher</h1>
+<p align='left'><strong>Watch files the precise way.</strong></p>
+<hr>
+<p align='right'><em><strong><dfn>Precise</dfn></strong>: <q cite='https://www.dictionary.com/browse/precise'>definitely or strictly stated, defined, or fixed</q>.</em></p>
 
 ## Status
 ![Linux & MacOS CI](https://github.com/AlexisPuga/precise-watcher/workflows/Linux%20%26%20MacOS%20CI/badge.svg)
@@ -29,7 +33,7 @@ To run it, just modify any file not included in your .gitignore file...
 
 ### Posibilities
 This tool allows you to:
-- Run commands on 1 single file when it changes.
+- Run commands on 1 single file when it changes (by using "&lt;file&gt;" in src.run.args).
 - Call as many commands in parallel or serial as you want.
 - Watch not only for changes but errors, removals, addings, ...
 - Watch multiple sources and run multiple scoped commands.
@@ -196,7 +200,7 @@ If you need more inspiration, you can check out these examples:
     "run": [{
       /** @type {?string} The command to run. */
       "cmd": "",
-      /** @type {?string[]} List of arguments for cmd. */
+      /** @type {?string[]} List of arguments for cmd. Use "<file>" to replace it with the changed filepath. */
       "args": [],
       /** @type {?string} Any of "serial" or "parallel". Defaults to "serial". */
       "callNext": "serial"
