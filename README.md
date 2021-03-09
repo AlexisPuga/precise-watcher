@@ -5,8 +5,28 @@
 <hr>
 <p align='right'><em><strong><dfn>Precise</dfn></strong>: <q cite='https://www.dictionary.com/browse/precise'>definitely or strictly stated, defined, or fixed</q>.</em></p>
 
+## Contents
+1. [Status](#status)
+2. [Installation](#installation)
+3. [Usage](#usage)
+    1. [Posibilities](#posibilities)
+    2. [Watch files using NPM scripts](#watch-files-using-npm-scripts)
+        1. [Setting options in a configuration file](#setting-options-in-a-configuration-file)
+    3. [Watch files using your console](#watch-files-using-your-console)
+        1. [Supported options](#supported-options)
+    4. [Watch files using js](#watch-files-using-js)
+4. [Examples](#examples)
+    1. [Run `eslint --fix` on 1 single file, when it changes](#run-eslint---fix-on-1-single-file-when-it-changes)
+5. [Supported options](#supported-options)
+6. [Credits](#credits)
+7. [License](#license)
+
 ## Status
 ![Linux & MacOS CI](https://github.com/AlexisPuga/precise-watcher/workflows/Linux%20%26%20MacOS%20CI/badge.svg)
+[![NPM version](https://badge.fury.io/js/precise-watcher.svg)](https://badge.fury.io/js/precise-watcher)
+
+## Installation
+Run `npm i precise-watcher` or `yarn add precise-watcher`.
 
 ## Usage
 Using `precise-watcher` is as simple as adding the following to your `package.json` and running `npm run watch`:
