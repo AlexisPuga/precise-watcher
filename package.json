@@ -18,7 +18,7 @@
     "src",
     "bin"
   ],
-  "version": "1.0.0-dev",
+  "version": "1.0.0-rc.1",
   "main": "src/index.js",
   "bin": {
     "precise-watcher": "bin/cli"
