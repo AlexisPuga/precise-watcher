@@ -24,6 +24,7 @@ describe('/src', () => {
 
   beforeEach(async () => {
     jest.resetModules()
+    jest.resetAllMocks()
     // Write initial file. This file shouldn't be handled by chokidar.
     fse.ensureFileSync(testFile)
     await preciseWatcher.stop()
@@ -73,6 +74,7 @@ describe('/src', () => {
         src: [{
           pattern: 'temp/**/*',
           baseDir: 'temp',
+          ignoreFrom: null,
           run: [{
             cmd: 'sleep',
             args: ['.15s'],
@@ -118,19 +120,22 @@ describe('/src', () => {
 
   it('Should ignore files from .gitignore-like files.', async () => {
     const { start } = preciseWatcher
+    const filepath = 'test/integration/src.test.js'
 
     mockJson('../../package.json', {
       'precise-watcher': {
         'src': [{
-          'pattern': 'test/integration/src.test.js'
+          pattern: filepath,
+          ignoreFrom: 'test/fixtures/.gitignore-like'
         }]
       }
     })
 
-    const [ watcher ] = await start({
-      ignoreFrom: 'test/fixtures/.gitignore-like'
-    })
+    const [ watcher ] = await start()
 
+    expect(mockDebugFn).toHaveBeenCalledWith(`Watching ${filepath},!${filepath} with the following options: ${JSON.stringify({
+      cwd: userDirectory
+    })}.`)
     expect(watcher._watched.size).toBe(0)
   })
 })

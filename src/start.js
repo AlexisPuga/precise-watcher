@@ -45,21 +45,26 @@ module.exports = async (options) => {
         ...globalChokidarOptions,
         ...localChokidarOptions
       }
-      const src = Array.isArray(pattern) ? pattern : [pattern]
+      let src = Array.isArray(pattern) ? pattern : [pattern]
       const eventNames = Array.isArray(on) ? on : [on]
 
       if (ignoreFrom) {
         const filepath = path.join(userDirectory, ignoreFrom)
         const sourcesToIgnore = await (ignoreFromFile(filepath).catch(logError))
-        const ignoredSources = ((ignoredSources) => {
-          if (!Array.isArray(ignoredSources)) {
-            ignoredSources = (ignoredSources ? [ignoredSources] : [])
+        // Workaroud:
+        // We negate ignored sources because it seems that the "ignore"
+        // option in chokidar watches files and THEN ignores them.
+        // This way we don't watch sources we don't want and we avoid
+        // ENOSPC errors in common scenarios.
+        const negatedSourcesToIgnore = sourcesToIgnore.map((src) => {
+          if (src[0] === '!') {
+            return src.slice(1)
           }
 
-          return ignoredSources
-        })(chokidarOptions.ignored)
+          return '!' + src
+        })
 
-        chokidarOptions.ignored = ignoredSources.concat(sourcesToIgnore)
+        src = src.concat(negatedSourcesToIgnore)
       }
 
       debug(`Watching ${src} with the following options: ${JSON.stringify(chokidarOptions)}.`)
