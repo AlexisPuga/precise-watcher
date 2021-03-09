@@ -47,7 +47,7 @@ describe('/src', () => {
     expect(mockDebugFn).toHaveBeenCalledWith('Reading "precise-watcher" property from package.json.')
   })
 
-  it('Should read given sources', async () => new Promise(async (resolve) => {
+  it('Should read given sources', async () => new Promise((resolve) => {
     const { start } = preciseWatcher
     let order = 0
 
@@ -90,10 +90,10 @@ describe('/src', () => {
       }
     })
 
-    const [ watcher ] = await start()
-
-    watcher.on('ready', async () => {
-      await fse.writeFile(testFile, '1')
+    start().then(([watcher]) => {
+      watcher.on('ready', async () => {
+        await fse.writeFile(testFile, '1')
+      })
     })
   }).then(() => {
     // then, it gets queued in order:
@@ -124,14 +124,14 @@ describe('/src', () => {
 
     mockJson('../../package.json', {
       'precise-watcher': {
-        'src': [{
+        src: [{
           pattern: filepath,
           ignoreFrom: 'test/fixtures/.gitignore-like'
         }]
       }
     })
 
-    const [ watcher ] = await start()
+    const [watcher] = await start()
 
     expect(mockDebugFn).toHaveBeenCalledWith(`Watching ${filepath},!${filepath} with the following options: ${JSON.stringify({
       cwd: userDirectory
