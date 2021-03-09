@@ -25,7 +25,7 @@ Using `precise-watcher` is as simple as adding the following to your `package.js
   }
 }
 ```
-To run it, just modify any file...
+To run it, just modify any file not included in your .gitignore file...
 
 ### Posibilities
 This tool allows you to:
@@ -95,15 +95,32 @@ Option   | Defaults      | Description
 Should be as easy as:
 ``` js
 const { start, stop, shutdown } = require('precise-watcher')
-// Returns an array of chokidar.watch() instances:
-const watchers = start()
 
-// To remove some watchers:
-stop(watchers)
-// To remove all watchers:
-stop()
-// To exit:
-shutdown()
+// Resolves to an array of chokidar.watch() instances:
+start().then((watchers) => {
+  // To remove some watchers:
+  stop(watchers)
+  // To remove all watchers:
+  stop()
+  // To exit:
+  shutdow() // Calls stop() internally.
+}) // ...
+```
+With async/await:
+``` js
+const { start, stop, shutdown } = require('precise-watcher')
+
+(async () => {
+  try {
+    const watchers = await start()
+
+    stop(watchers)
+    stop()
+    shutdown()
+  } catch (error) {
+    // Log error...
+  }
+})()
 ```
 
 ## Examples
@@ -150,7 +167,8 @@ If you need more inspiration, you can check out these examples:
   /** @type {?object} (Optional) chokidar options that will apply to all sources. Defaults to the following, as of chokidar@3.5: */
   "chokidar": {
     "persistent": true,
-    "ignored": undefined,
+    // Concatenated with src.ignoreFrom sources.
+    "ignored": [],
     "ignoreInitial": false,
     "followSymlinks": false,
     // Defaults to value passed via --cwd, "cwd" param in src/start.js' main function, or process.cwd()
@@ -170,6 +188,8 @@ If you need more inspiration, you can check out these examples:
     "pattern": [],
     /** @type {?string} (Optional) Set "<file>" replacement relative to this value. Basically: path.relative(baseDir, watchedFile). Useful to convert /some/path/file to /file, for example */
     "baseDir": "",
+    /** @type {?string} A path to a .gitignore-like file to ignore sources matched by src.pattern. Relative to cwd. */
+    "ignoreFrom": ".gitignore",
     /** @type {object|object[]} An array of commands. */
     "run": [{
       /** @type {?string} The command to run. */

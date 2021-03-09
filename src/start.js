@@ -4,8 +4,10 @@ const chokidar = require('chokidar')
 const readConfig = require('./lib/read-config')
 const handleEvent = require('./handle-event')
 const allWatchers = require('./watchers')
+const ignoreFromFile = require('./lib/ignore-from-file')
+const logError = console.error
 
-module.exports = (options) => {
+module.exports = async (options) => {
   const {
     cwd: userDirectory = process.cwd(),
     config: configFile = 'package.json'
@@ -34,8 +36,8 @@ module.exports = (options) => {
       (src) => Boolean(src)
     )
     debug('Reading sources...')
-    const watchers = sources.map((value) => {
-      const { pattern, baseDir, run, on, chokidar: localChokidarOptions } = Object(value)
+    const watchers = sources.map(async (value) => {
+      const { pattern, baseDir, run, on, ignoreFrom = '.gitignore', chokidar: localChokidarOptions } = Object(value)
       const chokidarOptions = {
         cwd: userDirectory,
         ...globalChokidarOptions,
@@ -43,6 +45,20 @@ module.exports = (options) => {
       }
       const src = Array.isArray(pattern) ? pattern : [pattern]
       const eventNames = Array.isArray(on) ? on : [on]
+
+      if (ignoreFrom) {
+        const filepath = path.join(userDirectory, ignoreFrom)
+        const sourcesToIgnore = await (ignoreFromFile(filepath).catch(logError))
+        const ignoredSources = ((ignoredSources) => {
+          if (!Array.isArray(ignoredSources)) {
+            ignoredSources = (ignoredSources ? [ignoredSources] : [])
+          }
+
+          return ignoredSources
+        })(chokidarOptions.ignored)
+
+        chokidarOptions.ignored = ignoredSources.concat(sourcesToIgnore)
+      }
 
       debug(`Watching ${src} with the following options: ${JSON.stringify(chokidarOptions)}.`)
       const watcher = chokidar.watch(src, chokidarOptions)
@@ -68,7 +84,7 @@ module.exports = (options) => {
     })
 
     debug('Done. Returning chokidar watchers...')
-    return watchers
+    return await Promise.all(watchers)
   } else {
     debug('No options found. Returning null...')
   }

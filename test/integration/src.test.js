@@ -42,11 +42,11 @@ describe('/src', () => {
       'precise-watcher': {}
     })
 
-    expect(start()).toMatchObject([])
+    expect(await start()).toMatchObject([])
     expect(mockDebugFn).toHaveBeenCalledWith('Reading "precise-watcher" property from package.json.')
   })
 
-  it('Should read given sources', async () => new Promise((resolve) => {
+  it('Should read given sources', async () => new Promise(async (resolve) => {
     const { start } = preciseWatcher
     let order = 0
 
@@ -88,7 +88,7 @@ describe('/src', () => {
       }
     })
 
-    const [ watcher ] = start()
+    const [ watcher ] = await start()
 
     watcher.on('ready', async () => {
       await fse.writeFile(testFile, '1')
@@ -106,13 +106,31 @@ describe('/src', () => {
     expect(runCmd.mock.results[2].value).resolves.toBe(2)
   }))
 
-  it('Should read package.json from any location.', () => {
+  it('Should read package.json from any location.', async () => {
     const { start } = preciseWatcher
 
-    start({
+    await start({
       config: 'test/fixtures/package.json'
     })
 
     expect(mockDebugFn).toHaveBeenCalledWith('Reading "precise-watcher" property from package.json.')
+  })
+
+  it('Should ignore files from .gitignore-like files.', async () => {
+    const { start } = preciseWatcher
+
+    mockJson('../../package.json', {
+      'precise-watcher': {
+        'src': [{
+          'pattern': 'test/integration/src.test.js'
+        }]
+      }
+    })
+
+    const [ watcher ] = await start({
+      ignoreFrom: 'test/fixtures/.gitignore-like'
+    })
+
+    expect(watcher._watched.size).toBe(0)
   })
 })

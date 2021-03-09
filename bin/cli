@@ -21,10 +21,10 @@ const { argv } = yargs(hideBin(process.argv))
       defaults: 'package.json',
       describe: 'Path to your config. file, relative to --cwd.'
     }
-  }, (argv) => {
+  }, async (argv) => {
     process.on('exit', shutdown)
 
     log('Starting precise-watcher...')
-    start(argv)
+    await start(argv)
   })
   .command('stop', 'Stop watching files.', {}, () => stop())
