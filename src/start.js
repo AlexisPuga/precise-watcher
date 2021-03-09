@@ -35,8 +35,10 @@ module.exports = async (options) => {
     const sources = (Array.isArray(src) ? src : [src]).filter(
       (src) => Boolean(src)
     )
+    const watchers = []
+
     debug('Reading sources...')
-    const watchers = sources.map(async (value) => {
+    for await (const value of sources) {
       const { pattern, baseDir, run, on, ignoreFrom = '.gitignore', chokidar: localChokidarOptions } = Object(value)
       const chokidarOptions = {
         cwd: userDirectory,
@@ -68,7 +70,7 @@ module.exports = async (options) => {
       allWatchers.push(watcher)
 
       debug('Attaching events...')
-      eventNames.forEach((eventName) => {
+      for await (let eventName of eventNames) {
         if (typeof eventName !== 'string') {
           eventName = 'change'
         }
@@ -78,13 +80,13 @@ module.exports = async (options) => {
           baseDir,
           cmd: { cwd: userDirectory }
         }))
-      })
+      }
 
-      return watcher
-    })
+      watchers.push(watcher)
+    }
 
     debug('Done. Returning chokidar watchers...')
-    return await Promise.all(watchers)
+    return watchers
   } else {
     debug('No options found. Returning null...')
   }
