@@ -26,6 +26,7 @@ describe('/src', () => {
     jest.resetModules()
     // Write initial file. This file shouldn't be handled by chokidar.
     fse.ensureFileSync(testFile)
+    preciseWatcher.stop()
   })
 
   afterEach(() => {
