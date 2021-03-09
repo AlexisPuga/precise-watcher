@@ -97,11 +97,13 @@ Should be as easy as:
 const { start, stop, shutdown } = require('precise-watcher')
 
 // Resolves to an array of chokidar.watch() instances:
-start().then((watchers) => {
+start().then(async (watchers) => {
   // To remove some watchers:
-  stop(watchers)
+  // Resolves to an array of each watcher.close() result.
+  const closedWatchers = await stop(watchers)
   // To remove all watchers:
-  stop()
+  const allClosedWatchers = await stop()
+
   // To exit:
   shutdow() // Calls stop() internally.
 }) // ...
@@ -113,9 +115,9 @@ const { start, stop, shutdown } = require('precise-watcher')
 (async () => {
   try {
     const watchers = await start()
+    const closedWatchers = await stop(watchers)
+    const allClosedWatchers = await stop()
 
-    stop(watchers)
-    stop()
     shutdown()
   } catch (error) {
     // Log error...

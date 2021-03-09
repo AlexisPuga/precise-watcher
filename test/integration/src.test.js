@@ -22,11 +22,11 @@ describe('/src', () => {
   const testFilename = 'example'
   const testFile = path.join(userDirectory, 'temp/test/', testFilename)
 
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.resetModules()
     // Write initial file. This file shouldn't be handled by chokidar.
     fse.ensureFileSync(testFile)
-    preciseWatcher.stop()
+    await preciseWatcher.stop()
   })
 
   afterEach(() => {
