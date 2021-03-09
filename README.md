@@ -45,7 +45,7 @@ Using `precise-watcher` is as simple as adding the following to your `package.js
     "watch": "precise-watcher"
   },
   "devDependency": {
-    "precise-watcher": "git+https://git@github.com/AlexisPuga/precise-watcher.git" // NPM package not available yet until version 1.
+    "precise-watcher": "^1.0.0"
   }
 }
 ```
