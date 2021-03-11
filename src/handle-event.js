@@ -3,71 +3,94 @@ const debug = require('debug')('precise-watcher')
 const runCmd = require('./lib/run-cmd')
 const log = console.log
 const logError = console.error
-const pathNthArgs = {
-  add: 0,
-  change: 0,
-  unlink: 0,
-  addDir: 0,
-  unlinkDir: 0,
-  raw: 1
+const normalizeEventArgs = (eventName, args) => {
+  const getArg = (chokidarArgsIndexes) => args[chokidarArgsIndexes[eventName]]
+  const path = getArg({
+    add: 0,
+    change: 0,
+    unlink: 0,
+    addDir: 0,
+    unlinkDir: 0,
+    raw: 1
+  })
+  const stats = getArg({
+    add: 1,
+    addDir: 1,
+    change: 1
+  })
+  const error = getArg({
+    error: 0
+  })
+  const event = getArg({
+    raw: 0
+  })
+  const details = getArg({
+    raw: 2
+  })
+
+  return { path, stats, error, event, details }
+}
+const replaceTokensInCommandArg = (cmdArg, { path: pathArg }, { baseDir }) => {
+  return cmdArg.replace(/<file>/g, () => {
+    const pathArgRelativeToBaseDir = path.relative(baseDir, pathArg)
+
+    debug(`Replacing <file> with ${pathArgRelativeToBaseDir}`)
+    return pathArgRelativeToBaseDir
+  })
+}
+const replaceTokensInCommandArgs = (commandArgs, eventArgs, options) => {
+  return commandArgs.map(
+    (cmdArg) => replaceTokensInCommandArg(cmdArg, eventArgs, options)
+  )
 }
 
 module.exports = (eventName, commands, {
   baseDir = '.',
   cmd: cmdOptions
-}) => {
-  const pathNthArg = pathNthArgs[eventName]
+}) => async (...args) => {
+  const eventArgs = normalizeEventArgs(eventName, args)
+  const next = async (commands, i = 0) => await new Promise((resolve, reject) => {
+    const command = commands[i]
 
-  return async (...args) => {
-    const next = async (commands, i) => await new Promise((resolve, reject) => {
-      const command = commands[i]
+    if (command) {
+      const { cmd, args: commandArgs = [], callNext = 'serial' } = command
+      const serial = callNext === 'serial'
+      const parallel = callNext === 'parallel'
+      const cmdArgs = replaceTokensInCommandArgs(commandArgs, eventArgs, {
+        baseDir
+      })
 
-      if (command) {
-        const { cmd, args: commandArgs = [], callNext = 'serial' } = command
-        const serial = callNext === 'serial'
-        const parallel = callNext === 'parallel'
-        const cmdArgs = commandArgs.map((cmdArg) => {
-          return cmdArg.replace(/<file>/g, () => {
-            const pathArg = args[pathNthArg]
-            const pathArgRelativeToBaseDir = path.relative(baseDir, pathArg)
+      debug(`Running ${cmd}, args: ${JSON.stringify(cmdArgs)}, options: ${JSON.stringify(cmdOptions)}.`)
+      runCmd(cmd, cmdArgs, cmdOptions).then(async (status) => {
+        log(`${cmd} exited with status ${status}`)
 
-            debug(`Replacing <file> with ${pathArgRelativeToBaseDir}`)
-            return pathArgRelativeToBaseDir
-          })
-        })
-
-        debug(`Running ${cmd}, args: ${JSON.stringify(cmdArgs)}, options: ${JSON.stringify(cmdOptions)}.`)
-        runCmd(cmd, cmdArgs, cmdOptions).then(async (status) => {
-          log(`${cmd} exited with status ${status}`)
-
-          if (serial) {
-            debug('Calling next command in serial...')
-            await next(commands, i + 1)
-          } else {
-            debug('Skipping "serial" call.')
-          }
-        }).catch(reject)
-
-        if (parallel) {
-          debug('Calling next command in parallel...')
-          next(commands, i + 1).catch(reject)
+        if (serial) {
+          debug('Calling next command in serial...')
+          await next(commands, i + 1)
+        } else {
+          debug('Skipping "serial" call.')
         }
+      }).catch(reject)
 
-        if (!serial && !parallel) {
-          reject(new TypeError(`src.callNext value (${callNext}) is invalid.`))
-        }
-      } else {
-        debug('No commands found. Resolving...')
-        resolve()
+      if (parallel) {
+        debug('Calling next command in parallel...')
+        next(commands, i + 1).catch(reject)
       }
-    })
 
-    try {
-      debug('Running commands...')
-      await next(commands, 0)
-    } catch (exception) {
-      logError(exception)
-      process.exitCode = 1
+      if (!serial && !parallel) {
+        reject(new TypeError(`src.callNext value (${callNext}) is invalid.`))
+      }
+    } else {
+      debug('No commands found. Resolving...')
+      resolve()
     }
+  })
+
+  try {
+    debug('Running commands...')
+    await next(commands)
+  } catch (exception) {
+    logError(exception)
+    process.exitCode = 1
   }
 }
