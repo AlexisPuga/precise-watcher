@@ -11,12 +11,10 @@ const mockDebugFn = jest.fn()
 jest.mock('debug', () => {
   return jest.fn().mockImplementation(() => mockDebugFn)
 })
-jest.mock('../../src/lib/run-cmd')
 jest.spyOn(console, 'log').mockImplementation(() => {})
 jest.spyOn(console, 'error').mockImplementation(() => {})
 
 describe('/src', () => {
-  const runCmd = require('../../src/lib/run-cmd')
   const preciseWatcher = require('../../src')
   const userDirectory = process.cwd()
   const testFilename = 'example'
@@ -47,66 +45,75 @@ describe('/src', () => {
     expect(mockDebugFn).toHaveBeenCalledWith('Reading "precise-watcher" property from package.json.')
   })
 
-  it('Should read given sources', async () => new Promise((resolve) => {
-    const { start } = preciseWatcher
-    let order = 0
+  it('Should read given sources', async () => {
+    jest.mock('../../src/lib/run-cmd')
 
-    runCmd.mockImplementation(async (cmd, args) => {
-      if (cmd === 'sleep') {
-        const ms = parseFloat(args) * 1000
+    const runCmd = require('../../src/lib/run-cmd')
 
-        await wait(ms)
-      }
+    return new Promise((resolve) => {
+      let order = 0
 
-      order++
+      runCmd.mockImplementation(async (cmd, args) => {
+        if (cmd === 'sleep') {
+          const ms = parseFloat(args) * 1000
 
-      const calls = order
-      const cmdCount = 3
+          await wait(ms)
+        }
 
-      if (calls === cmdCount) {
-        resolve()
-      }
+        order++
 
-      return order
-    })
-    mockJson('../../package.json', {
-      'precise-watcher': {
-        src: [{
-          pattern: 'temp/**/*',
-          baseDir: 'temp',
-          ignoreFrom: null,
-          run: [{
-            cmd: 'sleep',
-            args: ['.15s'],
-            callNext: 'parallel'
-          }, {
-            cmd: 'echo',
-            args: ['serial']
-          }, {
-            cmd: 'echo',
-            args: ['<file>']
-          }]
-        }]
-      }
-    })
+        const calls = order
+        const cmdCount = 3
 
-    start().then(([watcher]) => {
-      watcher.on('ready', async () => {
-        await fse.writeFile(testFile, '1')
+        if (calls === cmdCount) {
+          resolve()
+        }
+
+        return order
       })
-    })
-  }).then(() => {
-    // then, it gets queued in order:
-    expect(runCmd).toHaveBeenNthCalledWith(1, 'sleep', ['.15s'], { cwd: userDirectory })
-    expect(runCmd).toHaveBeenNthCalledWith(2, 'echo', ['serial'], { cwd: userDirectory })
-    expect(runCmd).toHaveBeenNthCalledWith(3, 'echo', [`test/${testFilename}`], { cwd: userDirectory })
+      mockJson('../../package.json', {
+        'precise-watcher': {
+          src: [{
+            pattern: 'temp/**/*',
+            baseDir: 'temp',
+            ignoreFrom: null,
+            run: [{
+              cmd: 'sleep',
+              args: ['.15s'],
+              callNext: 'parallel'
+            }, {
+              cmd: 'echo',
+              args: ['serial']
+            }, {
+              cmd: 'echo',
+              args: ['<file>']
+            }]
+          }]
+        }
+      })
 
-    // but, it gets called in disorder:
-    // 0 (call) -> 3 (order) -> first call was last.
-    expect(runCmd.mock.results[0].value).resolves.toBe(3)
-    expect(runCmd.mock.results[1].value).resolves.toBe(1)
-    expect(runCmd.mock.results[2].value).resolves.toBe(2)
-  }))
+      const { start } = require('../../src')
+
+      start().then(([watcher]) => {
+        watcher.on('ready', async () => {
+          await fse.writeFile(testFile, '1')
+        })
+      })
+    }).then(() => {
+      // then, it gets queued in order:
+      expect(runCmd).toHaveBeenNthCalledWith(1, 'sleep', ['.15s'], { cwd: userDirectory })
+      expect(runCmd).toHaveBeenNthCalledWith(2, 'echo', ['serial'], { cwd: userDirectory })
+      expect(runCmd).toHaveBeenNthCalledWith(3, 'echo', [`test/${testFilename}`], { cwd: userDirectory })
+
+      // but, it gets called in disorder:
+      // 0 (call) -> 3 (order) -> first call was last.
+      expect(runCmd.mock.results[0].value).resolves.toBe(3)
+      expect(runCmd.mock.results[1].value).resolves.toBe(1)
+      expect(runCmd.mock.results[2].value).resolves.toBe(2)
+    }).finally(() => {
+      jest.unmock('../../src/lib/run-cmd')
+    })
+  })
 
   it('Should read package.json from any location.', async () => {
     const { start } = preciseWatcher
