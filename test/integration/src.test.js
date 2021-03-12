@@ -48,6 +48,7 @@ describe('/src', () => {
 
   it('Should read given sources', async () => {
     const mockRunCmd = jest.fn()
+    let preciseWatcher
 
     return new Promise((resolve) => {
       jest.doMock('../../src/lib/run-cmd', () => {
@@ -95,7 +96,9 @@ describe('/src', () => {
         }
       })
 
-      const { start } = require('../../src')
+      preciseWatcher = require('../../src')
+
+      const { start } = preciseWatcher
 
       start().then(([watcher]) => {
         watcher.on('ready', async () => {
@@ -113,9 +116,10 @@ describe('/src', () => {
       expect(mockRunCmd.mock.results[0].value).resolves.toBe(3)
       expect(mockRunCmd.mock.results[1].value).resolves.toBe(1)
       expect(mockRunCmd.mock.results[2].value).resolves.toBe(2)
-    }).finally(() => {
+    }).finally(async () => {
       jest.unmock('../../src/lib/run-cmd')
       mockRunCmd.mockClear()
+      await preciseWatcher.stop()
     })
   })
 
@@ -181,7 +185,7 @@ describe('/src', () => {
 
   it('Should replace <file> and call the same command multiple times ' +
     'with each given pattern, when a default value is used.', async (done) => {
-    const { start } = require('../../src')
+    const { start } = preciseWatcher
 
     mockJson('../../package.json', {
       'precise-watcher': {
@@ -208,6 +212,8 @@ describe('/src', () => {
       expect(mockDebugFn).toHaveBeenCalledWith('Replacing <file> with test/fixtures/package.json')
       expect(mockDebugFn).toHaveBeenCalledWith('Replacing <file> with test/fixtures/precise-watcher.config.js')
 
+      // Make sure to stop watching to prevent open handles:
+      await watcher.close()
       done()
     })
   })
