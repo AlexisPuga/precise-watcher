@@ -178,4 +178,37 @@ describe('/src', () => {
       done()
     })
   })
+
+  it('Should replace <file> and call the same command multiple times ' +
+    'with each given pattern, when a default value is used.', async (done) => {
+    const { start } = require('../../src')
+
+    mockJson('../../package.json', {
+      'precise-watcher': {
+        src: [{
+          pattern: [
+            'test/fixtures/package.json',
+            'test/fixtures/precise-watcher.config.js'
+          ],
+          on: 'ready',
+          ignoreFrom: null,
+          run: [{
+            cmd: 'echo',
+            args: ['<file>']
+          }]
+        }]
+      }
+    })
+
+    const [watcher] = await start()
+
+    watcher.on('ready', async () => {
+      await flushPromises()
+
+      expect(mockDebugFn).toHaveBeenCalledWith('Replacing <file> with test/fixtures/package.json')
+      expect(mockDebugFn).toHaveBeenCalledWith('Replacing <file> with test/fixtures/precise-watcher.config.js')
+
+      done()
+    })
+  })
 })
