@@ -220,7 +220,13 @@ If you need more inspiration, you can check out these examples:
     "run": [{
       /** @type {?string} The command to run. */
       "cmd": "",
-      /** @type {?string[]} List of arguments for cmd. Use "<file>" to replace it with the changed filepath. */
+      /**
+       * @type {?string[]} List of arguments for cmd.
+       *
+       * Use "<file>" to replace it with the changed filepath if the event
+       * supports it, or set each src.pattern value as default (and call
+       * this command in parallel multiple times with each given pattern).
+       */
       "args": [],
       /** @type {?string} Any of "serial" or "parallel". Defaults to "serial". */
       "callNext": "serial"

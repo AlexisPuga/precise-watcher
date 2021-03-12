@@ -68,7 +68,28 @@ module.exports = (eventName, commands, {
       const cmdArgs = replaceTokensInCommandArgs(commandArgs, eventArgs, {
         baseDir,
         defaults: {
-          path: patterns.join(',')
+          get path () {
+            const patternIndex = command._patternIndex || 0
+            const currentPattern = patterns[patternIndex]
+            const nextPattern = patterns[patternIndex + 1]
+
+            // Clone the current command and call it on the next
+            // iteration with new patterns:
+            if (nextPattern) {
+              const commandClone = { ...command }
+
+              // @TEST_ME
+              // Run the next command as required (in serial or parallel).
+              commandClone.callNext = command.callNext
+              // But call this in parallel.
+              command.callNext = 'parallel'
+
+              commandClone._patternIndex = patternIndex + 1
+              commands.splice(i + 1, 0, commandClone)
+            }
+
+            return currentPattern
+          }
         }
       })
 
