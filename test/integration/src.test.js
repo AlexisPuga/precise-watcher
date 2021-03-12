@@ -7,6 +7,8 @@ const wait = async (ms) => new Promise((resolve) => {
   setTimeout(resolve, ms)
 })
 const mockDebugFn = jest.fn()
+// Based on https://github.com/kentor/flush-promises
+const flushPromises = () => new Promise((resolve) => global.setTimeout(resolve, 300))
 
 jest.mock('debug', () => {
   return jest.fn().mockImplementation(() => mockDebugFn)
@@ -113,6 +115,7 @@ describe('/src', () => {
       expect(mockRunCmd.mock.results[2].value).resolves.toBe(2)
     }).finally(() => {
       jest.unmock('../../src/lib/run-cmd')
+      mockRunCmd.mockClear()
     })
   })
 
