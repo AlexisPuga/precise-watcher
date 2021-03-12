@@ -153,4 +153,33 @@ describe('/src', () => {
     })}.`)
     expect(watcher._watched.size).toBe(0)
   })
+
+  it('Should set a default value for each supported token and respect ' +
+    'the src.baseDir options.', async (done) => {
+    const { start } = preciseWatcher
+
+    mockJson('../../package.json', {
+      'precise-watcher': {
+        src: [{
+          pattern: 'test/integration/src.test.js',
+          on: 'ready',
+          baseDir: 'test/integration',
+          ignoreFrom: 'test/fixtures/.gitignore-like',
+          run: [{
+            cmd: 'echo',
+            args: ['<file>']
+          }]
+        }]
+      }
+    })
+
+    const [watcher] = await start()
+
+    watcher.on('ready', () => {
+      expect(mockDebugFn).toHaveBeenCalledWith('The path argument is empty. Using default value.')
+      // Should remove ignored paths from default values:
+      expect(mockDebugFn).toHaveBeenCalledWith('Replacing <file> with src.test.js')
+      done()
+    })
+  })
 })

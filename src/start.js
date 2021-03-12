@@ -45,8 +45,9 @@ module.exports = async (options) => {
         ...globalChokidarOptions,
         ...localChokidarOptions
       }
-      let src = Array.isArray(pattern) ? pattern : [pattern]
+      const patterns = Array.isArray(pattern) ? pattern : [pattern]
       const eventNames = Array.isArray(on) ? on : [on]
+      let src = patterns
 
       if (ignoreFrom) {
         const filepath = path.join(userDirectory, ignoreFrom)
@@ -82,6 +83,7 @@ module.exports = async (options) => {
 
         debug(`Attaching "${eventName}" event.`)
         watcher.on(eventName, handleEvent(eventName, run, {
+          patterns,
           baseDir,
           cmd: { cwd: userDirectory }
         }))
