@@ -1,0 +1,12 @@
+#!/bin/bash
+version="$1"
+
+if [[ $version ]]; then
+	title="$version"
+	changes=$''`git log --oneline $(git describe --tags --abbrev=0 @^)..@`
+	commitMessage="$title"$'\n\n'"$changes"
+
+	npm version "$version" -m "$commitMessage"
+else
+	echo "Please provide the next version."
+fi
