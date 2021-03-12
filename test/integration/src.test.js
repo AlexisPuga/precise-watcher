@@ -111,6 +111,8 @@ describe('/src', () => {
       expect(mockRunCmd.mock.results[0].value).resolves.toBe(3)
       expect(mockRunCmd.mock.results[1].value).resolves.toBe(1)
       expect(mockRunCmd.mock.results[2].value).resolves.toBe(2)
+    }).finally(() => {
+      jest.unmock('../../src/lib/run-cmd')
     })
   })
 
