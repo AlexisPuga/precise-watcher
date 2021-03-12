@@ -30,12 +30,20 @@ const normalizeEventArgs = (eventName, args) => {
 
   return { path, stats, error, event, details }
 }
-const replaceTokensInCommandArg = (cmdArg, { path: pathArg }, { baseDir }) => {
+const replaceTokensInCommandArg = (cmdArg, { path: pathArg }, {
+  baseDir,
+  defaults = {}
+}) => {
   return cmdArg.replace(/<file>/g, () => {
-    const pathArgRelativeToBaseDir = path.relative(baseDir, pathArg)
+    if (!pathArg) {
+      debug('The path argument is empty. Using default value.')
+      pathArg = defaults.path
+    }
 
-    debug(`Replacing <file> with ${pathArgRelativeToBaseDir}`)
-    return pathArgRelativeToBaseDir
+    const filepath = path.relative(baseDir, pathArg)
+
+    debug(`Replacing <file> with ${filepath}`)
+    return filepath
   })
 }
 const replaceTokensInCommandArgs = (commandArgs, eventArgs, options) => {
@@ -45,6 +53,7 @@ const replaceTokensInCommandArgs = (commandArgs, eventArgs, options) => {
 }
 
 module.exports = (eventName, commands, {
+  patterns,
   baseDir = '.',
   cmd: cmdOptions
 }) => async (...args) => {
@@ -57,7 +66,10 @@ module.exports = (eventName, commands, {
       const serial = callNext === 'serial'
       const parallel = callNext === 'parallel'
       const cmdArgs = replaceTokensInCommandArgs(commandArgs, eventArgs, {
-        baseDir
+        baseDir,
+        defaults: {
+          path: patterns.join(',')
+        }
       })
 
       debug(`Running ${cmd}, args: ${JSON.stringify(cmdArgs)}, options: ${JSON.stringify(cmdOptions)}.`)
