@@ -5,7 +5,7 @@ const execFileAsync = promisify(execFile)
 
 describe('precise-watcher', () => {
   test.each([
-    ['default'],
+    ['default', []],
     ['"start"', ['start']]
   ])('Should work with defaults using the %s command.', async ($0, args) => {
     const { stderr, stdout } = await execFileAsync('bin/cli', args)

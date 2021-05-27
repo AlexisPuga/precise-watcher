@@ -155,7 +155,7 @@ describe('/src', () => {
   })
 
   it('Should set a default value for each supported token and respect ' +
-    'the src.baseDir options.', async (done) => {
+    'the src.baseDir options.', async () => {
     const { start } = preciseWatcher
 
     mockJson('../../package.json', {
@@ -173,18 +173,18 @@ describe('/src', () => {
       }
     })
 
-    const [watcher] = await start()
-
-    watcher.on('ready', () => {
-      expect(mockDebugFn).toHaveBeenCalledWith('The path argument is empty. Using default value.')
-      // Should remove ignored paths from default values:
-      expect(mockDebugFn).toHaveBeenCalledWith('Replacing <file> with src.test.js')
-      done()
-    })
+    return start().then(([watcher]) => new Promise((resolve) => {
+      watcher.on('ready', () => {
+        expect(mockDebugFn).toHaveBeenCalledWith('The path argument is empty. Using default value.')
+        // Should remove ignored paths from default values:
+        expect(mockDebugFn).toHaveBeenCalledWith('Replacing <file> with src.test.js')
+        resolve()
+      })
+    }))
   })
 
   it('Should replace <file> and call the same command multiple times ' +
-    'with each given pattern, when a default value is used.', async (done) => {
+    'with each given pattern, when a default value is used.', async () => {
     const { start } = preciseWatcher
 
     mockJson('../../package.json', {
@@ -204,17 +204,17 @@ describe('/src', () => {
       }
     })
 
-    const [watcher] = await start()
+    return start().then(([watcher]) => new Promise((resolve, reject) => {
+      watcher.on('ready', async () => {
+        await flushPromises().catch(reject)
 
-    watcher.on('ready', async () => {
-      await flushPromises()
+        expect(mockDebugFn).toHaveBeenCalledWith('Replacing <file> with test/fixtures/package.json')
+        expect(mockDebugFn).toHaveBeenCalledWith('Replacing <file> with test/fixtures/precise-watcher.config.js')
 
-      expect(mockDebugFn).toHaveBeenCalledWith('Replacing <file> with test/fixtures/package.json')
-      expect(mockDebugFn).toHaveBeenCalledWith('Replacing <file> with test/fixtures/precise-watcher.config.js')
-
-      // Make sure to stop watching to prevent open handles:
-      await watcher.close()
-      done()
-    })
+        // Make sure to stop watching to prevent open handles:
+        await watcher.close().catch(reject)
+        resolve()
+      })
+    }))
   })
 })
