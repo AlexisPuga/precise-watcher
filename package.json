@@ -1,7 +1,7 @@
 {
   "name": "precise-watcher",
   "title": "Precise Watcher",
-  "description": "Watch files the precise way.",
+  "description": "Automate tasks on file change, run them in parallel, and forget about tool-specific plugins.",
   "keywords": [
     "watch files",
     "run commands on watched file",
