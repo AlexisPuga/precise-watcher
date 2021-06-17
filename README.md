@@ -1,7 +1,8 @@
 <p align='right'><a href='https://github.com/standard/standard'><img src='https://cdn.rawgit.com/standard/standard/master/badge.svg' alt='JavaScript Style Guide'/></a></p>
 <hr>
 <h1 align='left'>Precise Watcher</h1>
-<p align='left'><strong>Watch files the precise way.</strong></p>
+<p align='left'>Automate tasks on file change, run them in parallel, and forget about tool-specific plugins.</p>
+<p><em>Think NPM scripts + (Precise) File watcher + Parallel scripting - Task Runner/Build Tool - Tool-specific plugins.</em></p>
 <hr>
 <p align='right'><em><strong><dfn>Precise</dfn></strong>: <q cite='https://www.dictionary.com/browse/precise'>definitely or strictly stated, defined, or fixed</q>.</em></p>
 
