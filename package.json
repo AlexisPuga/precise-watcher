@@ -54,6 +54,7 @@
   },
   "dependencies": {
     "chokidar": "^3.5.1",
+    "debug": "^4.3.1",
     "parse-gitignore": "^1.0.1",
     "yargs": "^16.2.0"
   }
