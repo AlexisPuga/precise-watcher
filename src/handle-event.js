@@ -62,7 +62,7 @@ module.exports = (eventName, commands, {
     const command = commands[i]
 
     if (command) {
-      const { cmd, args: commandArgs = [], callNext = 'serial' } = command
+      const { cmd, beforeRun, args: commandArgs = [], callNext = 'serial' } = command
       const serial = callNext === 'serial'
       const parallel = callNext === 'parallel'
       const cmdArgs = replaceTokensInCommandArgs(commandArgs, eventArgs, {
@@ -92,6 +92,30 @@ module.exports = (eventName, commands, {
           }
         }
       })
+
+      if (typeof beforeRun === 'function') {
+        // Command related info:
+        const cmdInfo = {
+          cmd: cmd,
+          args: cmdArgs,
+          options: cmdOptions
+        }
+        // Chokidar related info:
+        const eventInfo = {
+          name: eventName,
+          args: eventArgs
+        }
+        // Any other info:
+        const context = {
+          callNext,
+          patterns,
+          baseDir,
+          commands
+        }
+
+        debug('Calling beforeRun.call(context, cmdInfo, eventInfo).')
+        beforeRun.call(context, cmdInfo, eventInfo)
+      }
 
       debug(`Running ${cmd}, args: ${JSON.stringify(cmdArgs)}, options: ${JSON.stringify(cmdOptions)}.`)
       runCmd(cmd, cmdArgs, cmdOptions).then(async (status) => {

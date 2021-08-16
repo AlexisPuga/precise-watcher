@@ -217,4 +217,65 @@ describe('/src', () => {
       })
     }))
   })
+
+  it('Should support the beforeRun() option.', async () => {
+    const { start } = preciseWatcher
+    const mockFn = jest.fn()
+
+    // @TODO Use a config file instead.
+    mockJson('../../package.json', {
+      'precise-watcher': {
+        src: [{
+          pattern: [
+            'test/fixtures/package.json'
+          ],
+          on: 'ready',
+          ignoreFrom: null,
+          run: [{
+            cmd: 'sleep',
+            args: ['1s'],
+            beforeRun: mockFn
+          }]
+        }]
+      }
+    })
+
+    return start().then(([watcher]) => new Promise((resolve, reject) => {
+      watcher.on('ready', async () => {
+        await flushPromises().catch(reject)
+
+        expect(mockFn.mock.instances[0]).toMatchObject({
+          callNext: 'serial',
+          patterns: ['test/fixtures/package.json'],
+          baseDir: '.',
+          commands: [{
+            cmd: 'sleep',
+            args: ['1s'],
+            beforeRun: mockFn
+          }]
+        })
+        expect(mockFn.mock.calls[0][0]).toMatchObject({
+          cmd: 'sleep',
+          args: ['1s'],
+          options: {
+            cwd: userDirectory
+          }
+        })
+        expect(mockFn.mock.calls[0][1]).toMatchObject({
+          name: 'ready',
+          args: {
+            path: undefined,
+            stats: undefined,
+            error: undefined,
+            event: undefined,
+            details: undefined
+          }
+        })
+
+        // Make sure to stop watching to prevent open handles:
+        await watcher.close().catch(reject)
+        resolve()
+      })
+    }))
+  })
 })
