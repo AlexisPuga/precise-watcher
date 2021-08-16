@@ -278,4 +278,43 @@ describe('/src', () => {
       })
     }))
   })
+
+  it('Should skip command if beforeRun() returns false.', async () => {
+    const { start } = preciseWatcher
+    const mockFn = jest.fn().mockImplementation(() => false)
+
+    // @TODO Use a config file instead.
+    mockJson('../../package.json', {
+      'precise-watcher': {
+        src: [{
+          pattern: [
+            'test/fixtures/package.json'
+          ],
+          on: 'ready',
+          ignoreFrom: null,
+          run: [{
+            cmd: 'sleep',
+            args: ['1s'],
+            beforeRun: mockFn
+          }, {
+            cmd: 'echo',
+            args: ['<file>']
+          }]
+        }]
+      }
+    })
+
+    return start().then(([watcher]) => new Promise((resolve, reject) => {
+      watcher.on('ready', async () => {
+        await flushPromises().catch(reject)
+
+        expect(mockDebugFn).toHaveBeenCalledWith('Skipping sleep due return value of beforeRun (false).')
+        expect(mockDebugFn).toHaveBeenCalledWith(`Running echo, args: ["test/fixtures/package.json"], options: {"cwd":"${userDirectory}"}.`)
+
+        // Make sure to stop watching to prevent open handles:
+        await watcher.close().catch(reject)
+        resolve()
+      })
+    }))
+  })
 })

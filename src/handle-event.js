@@ -114,7 +114,14 @@ module.exports = (eventName, commands, {
         }
 
         debug('Calling beforeRun.call(context, cmdInfo, eventInfo).')
-        beforeRun.call(context, cmdInfo, eventInfo)
+        const keepRunning = beforeRun.call(context, cmdInfo, eventInfo)
+
+        if (keepRunning === false) {
+          debug(`Skipping ${cmd} due return value of beforeRun (${keepRunning}).`)
+          next(commands, i + 1).catch(reject)
+
+          return
+        }
       }
 
       debug(`Running ${cmd}, args: ${JSON.stringify(cmdArgs)}, options: ${JSON.stringify(cmdOptions)}.`)
