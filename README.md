@@ -230,7 +230,25 @@ If you need more inspiration, you can check out these examples:
        */
       "args": [],
       /** @type {?string} Any of "serial" or "parallel". Defaults to "serial". */
-      "callNext": "serial"
+      "callNext": "serial",
+      /** @type {?function} A function triggered before running the command. */
+      beforeRun (cmdInfo, eventInfo) {
+        const {
+          callNext,
+          patterns,
+          baseDir,
+          commands
+        } = this;
+        const {
+          cmd,
+          args: cmdArgs,
+          options: cmdOptions
+        } = cmdInfo;
+        const {
+          name: eventName,
+          args: eventArgs
+        } = eventInfo;
+      }
     }],
     /** @see https://github.com/paulmillr/chokidar */
     /** @type {?string[]} One or many chokidar events: "add", "unlink", "addDir", "unlinkDir", "error", "ready", "raw". Defaults to "change". */
