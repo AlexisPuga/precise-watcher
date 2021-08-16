@@ -231,7 +231,10 @@ If you need more inspiration, you can check out these examples:
       "args": [],
       /** @type {?string} Any of "serial" or "parallel". Defaults to "serial". */
       "callNext": "serial",
-      /** @type {?function} A function triggered before running the command. */
+      /**
+       * @type {?function} A function triggered before running the command.
+       * @return {?boolean} If false is returned, the command won't run.
+       */
       beforeRun (cmdInfo, eventInfo) {
         const {
           callNext,
@@ -248,6 +251,9 @@ If you need more inspiration, you can check out these examples:
           name: eventName,
           args: eventArgs
         } = eventInfo;
+        let keepRunning = true;
+
+        return keepRunning;
       }
     }],
     /** @see https://github.com/paulmillr/chokidar */
