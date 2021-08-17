@@ -36,6 +36,7 @@ Using `precise-watcher` is as simple as adding the following to your `package.js
   "precise-watcher": {
     "src": [{
       "pattern": ["**/*"],
+      "on": "change",
       "run": [{
         "cmd": "echo",
         "args": ["<file> changed."]
@@ -161,6 +162,7 @@ If you need more inspiration, you can check out these examples:
   "precise-watcher": {
     "src": [{
       "pattern": ["**/*.js"],
+      "on": "change",
       "run": [{
         "cmd": "echo",
         "args": [
