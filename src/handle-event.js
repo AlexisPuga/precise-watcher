@@ -118,7 +118,7 @@ module.exports = (eventName, commands, {
 
         if (keepRunning === false) {
           debug(`Skipping ${cmd} due return value of beforeRun (${keepRunning}).`)
-          next(commands, i + 1).catch(reject)
+          next(commands, i + 1).then(resolve).catch(reject)
 
           return
         }
@@ -134,11 +134,11 @@ module.exports = (eventName, commands, {
         } else {
           debug('Skipping "serial" call.')
         }
-      }).catch(reject)
+      }).then(resolve).catch(reject)
 
       if (parallel) {
         debug('Calling next command in parallel...')
-        next(commands, i + 1).catch(reject)
+        next(commands, i + 1).then(resolve).catch(reject)
       }
 
       if (!serial && !parallel) {
