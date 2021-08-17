@@ -257,7 +257,7 @@ If you need more inspiration, you can check out these examples:
       }
     }],
     /** @see https://github.com/paulmillr/chokidar */
-    /** @type {?string[]} One or many chokidar events: "add", "unlink", "addDir", "unlinkDir", "error", "ready", "raw". Defaults to "change". */
+    /** @type {?string[]|?string} One or many chokidar events: "add", "unlink", "addDir", "unlinkDir", "error", "ready", "raw". */
     "on": [],
     /** @see https://github.com/paulmillr/chokidar */
     /** @type {?object} Chokidar options that will apply to these sources only. Merged with global "chokidar" options. */

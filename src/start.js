@@ -76,11 +76,7 @@ module.exports = async (options) => {
       allWatchers.push(watcher)
 
       debug('Attaching events...')
-      for await (let eventName of eventNames) {
-        if (typeof eventName !== 'string') {
-          eventName = 'change'
-        }
-
+      for await (const eventName of eventNames) {
         debug(`Attaching "${eventName}" event.`)
         watcher.on(eventName, handleEvent(eventName, run, {
           patterns,

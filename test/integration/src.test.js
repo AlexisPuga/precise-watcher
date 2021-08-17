@@ -80,6 +80,7 @@ describe('/src', () => {
           src: [{
             pattern: 'temp/**/*',
             baseDir: 'temp',
+            on: 'change',
             ignoreFrom: null,
             run: [{
               cmd: 'sleep',
@@ -141,6 +142,7 @@ describe('/src', () => {
       'precise-watcher': {
         src: [{
           pattern: filepath,
+          on: 'change',
           ignoreFrom: 'test/fixtures/.gitignore-like'
         }]
       }
