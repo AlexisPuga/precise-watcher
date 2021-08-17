@@ -18,6 +18,7 @@
     4. [Watch files using js](#watch-files-using-js)
 4. [Examples](#examples)
     1. [Run `eslint --fix` on 1 single file, when it changes](#run-eslint---fix-on-1-single-file-when-it-changes)
+    2. [Copy /static content to /public. On development, serve /public; on production, exit](#copy-static-content-to-public-on-development-serve-public-on-production-exit)
 5. [Supported options](#supported-options)
 6. [Credits](#credits)
 7. [License](#license)
@@ -60,6 +61,7 @@ This tool allows you to:
 - Watch not only for changes but errors, removals, addings, ...
 - Watch multiple sources and run multiple scoped commands.
 - Write complex solutions easily.
+- [From v2.0]: Run all your commands and exit. Useful for production!
 
 Once you see what it does and why you need it, you can use it in any of the following ways:
 1. [NPM scripts](#watch-files-using-npm-scripts)
@@ -189,6 +191,67 @@ If you need more inspiration, you can check out these examples:
 ```
 3. Run `npm run watch`.
 4. Modify any .js file.
+
+
+
+### Copy /static content to /public. On development, serve /public; on production, exit.
+
+1. Install requirements: Run `npm install live-server precise-watcher@^2.0 cpy-cli --save-dev`.
+2. Create some files: `/static/index.html` and `/static/img/favicon.svg`, for example.
+3. Add the following to `precise-watcher.config.js`:
+
+```js
+const {NODE_ENV} = process.env;
+const isProduction = NODE_ENV === 'production';
+const isDevelopment = !isProduction;
+
+module.exports = {
+    "src": [].concat(isDevelopment ? {
+        "pattern": "public",
+        "on": "ready",
+        "run": [{
+            // Start development server.
+            "cmd": "live-server",
+            "args": ["public"]
+        }]
+    } : {
+        "pattern": "dist",
+        // Empty the /dist dir.
+        "run": [{
+            "cmd": "rm",
+            "args": ["dist -R"]
+        }, {
+            "cmd": "mkdir",
+            "args": ["dist"]
+        }]
+    }).concat({
+        "pattern": ["static/**/*.{jpg,jpeg,png,ico,svg,html}"],
+        "baseDir": "static",
+        "on": (isProduction
+            ? null // Run as soon as possible.
+            : ["ready", "change"] // Run when chokidar is ready and when it detects a change.
+        )
+        "run": {
+            // Copy your static content (images and HTMLs), one by one.
+            "cmd": "cpy",
+            "args": `<file> ../${isDevelopment ? "public" : "dist"} --cwd=static --parents`.split(" ")
+        }
+    })
+};
+```
+
+3. Update your npm scripts (update your `package.json`):
+```json
+"scripts": {
+    "start": "precise-watcher --config precise-watcher.config.js",
+    "dev": "NODE_ENV=development npm run start",
+    "prod": "NODE_ENV=production npm run start"
+}
+```
+
+4. Run `npm run dev` and wait for your browser to start. Then, modify any file (e.g, `static/index.html`) and your changes should be visible right away.
+
+5. When you're done, hit `ctrl + c` and run `npm run prod`. Your `/dist` folder will now contain all your final files.
 
 ## Supported options
 ``` js
