@@ -46,7 +46,6 @@ module.exports = async (options) => {
         ...localChokidarOptions
       }
       const patterns = Array.isArray(pattern) ? pattern : [pattern]
-      const eventNames = Array.isArray(on) ? on : [on]
       let src = patterns
 
       if (ignoreFrom) {
@@ -68,24 +67,35 @@ module.exports = async (options) => {
         src = src.concat(negatedSourcesToIgnore)
       }
 
-      debug(`Watching ${src} with the following options: ${JSON.stringify(chokidarOptions)}.`)
-      const watcher = chokidar.watch(src, chokidarOptions)
+      if (on) {
+        const eventNames = Array.isArray(on) ? on : [on]
 
-      // We add it instantly to allow instant shutdown.
-      debug('Storing watcher.')
-      allWatchers.push(watcher)
+        debug(`Watching ${src} with the following options: ${JSON.stringify(chokidarOptions)}.`)
+        const watcher = chokidar.watch(src, chokidarOptions)
 
-      debug('Attaching events...')
-      for await (const eventName of eventNames) {
-        debug(`Attaching "${eventName}" event.`)
-        watcher.on(eventName, handleEvent(eventName, run, {
+        // We add it instantly to allow instant shutdown.
+        debug('Storing watcher.')
+        allWatchers.push(watcher)
+
+        debug('Attaching events...')
+        for await (const eventName of eventNames) {
+          debug(`Attaching "${eventName}" event.`)
+          watcher.on(eventName, handleEvent(eventName, run, {
+            patterns,
+            baseDir,
+            cmd: { cwd: userDirectory }
+          }))
+        }
+
+        watchers.push(watcher)
+      } else {
+        debug('Handling empty event.')
+        await handleEvent(null, run, {
           patterns,
           baseDir,
           cmd: { cwd: userDirectory }
-        }))
+        })()
       }
-
-      watchers.push(watcher)
     }
 
     debug('Done. Returning chokidar watchers...')

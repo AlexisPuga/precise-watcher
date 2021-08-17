@@ -319,4 +319,32 @@ describe('/src', () => {
       })
     }))
   })
+
+  it('Should handle empty events.', async () => {
+    const { start } = preciseWatcher
+
+    mockJson('../../package.json', {
+      'precise-watcher': {
+        src: [{
+          pattern: [
+            'test/fixtures/package.json'
+          ],
+          on: null,
+          ignoreFrom: null,
+          run: [{
+            cmd: 'echo',
+            args: ['<file>']
+          }]
+        }]
+      }
+    })
+
+    const watchers = await start()
+
+    // No watchers were attached.
+    expect(watchers.length).toBe(0)
+    // Command run successfully.
+    expect(mockDebugFn).toHaveBeenCalledWith(`Running echo, args: ["test/fixtures/package.json"], options: {"cwd":"${userDirectory}"}.`)
+    // It resolved with no errors.
+  })
 })
