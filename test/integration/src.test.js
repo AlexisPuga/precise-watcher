@@ -285,6 +285,8 @@ describe('/src', () => {
 
         // Make sure to stop watching to prevent open handles:
         await watcher.close().catch(reject)
+        // @TODO Remove this timeout. Instead wait for logs to finish.
+        await wait(1e3)
         resolve()
       })
     }))
