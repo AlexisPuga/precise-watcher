@@ -3,10 +3,10 @@ const colors = require('colors/safe')
 colors.setTheme({
   silly: 'rainbow',
   input: 'grey',
-  verbose: 'cyan',
+  verbose: ['dim', 'magenta'],
   prompt: 'grey',
-  info: 'green',
-  data: 'grey',
+  info: 'bold',
+  data: 'italic',
   help: 'cyan',
   warn: 'yellow',
   debug: 'blue',

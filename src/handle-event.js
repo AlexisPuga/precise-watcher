@@ -125,7 +125,7 @@ module.exports = (eventName, commands, {
 
       debug(`Running ${cmd}, args: ${JSON.stringify(cmdArgs)}, options: ${JSON.stringify(cmdOptions)}.`)
       runCmd(cmd, cmdArgs, cmdOptions).then(async (status) => {
-        log('info', `${cmd} exited with status ${status}`)
+        log(`${status > 0 ? 'error' : 'verbose'}`, `${status > 0 ? '✕' : '✓'} ${cmd} ${cmdArgs.join(' ')}`)
 
         if (serial) {
           debug('Calling next command in serial...')

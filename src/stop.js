@@ -6,7 +6,7 @@ const removeAllWatchers = async (watchers) => await Promise.all(
 )
 
 module.exports = async (watchers) => {
-  log('info', 'Stopping precise-watcher...')
+  log('info', '\nStopping precise-watcher')
 
   if (!watchers) {
     debug('Removing all watchers.')

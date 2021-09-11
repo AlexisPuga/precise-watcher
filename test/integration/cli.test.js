@@ -23,8 +23,8 @@ describe('precise-watcher', () => {
 
     expect(stderr).toBe('')
     expect(stdout).toBe([
-      'Starting precise-watcher...',
-      'Stopping precise-watcher...'
+      'Starting precise-watcher',
+      '\nStopping precise-watcher'
     ].join('\n') + '\n')
   })
 
@@ -52,8 +52,8 @@ describe('precise-watcher', () => {
     expect(stderr).toMatch(`Setting config to ${config}`)
     expect(stderr).toMatch(`Reading ${path.join(cwd, config)}`)
     expect(stdout).toBe([
-      'Starting precise-watcher...',
-      'Stopping precise-watcher...'
+      'Starting precise-watcher',
+      '\nStopping precise-watcher'
     ].join('\n') + '\n')
   })
 
@@ -63,6 +63,6 @@ describe('precise-watcher', () => {
     })
 
     expect(stderr).toBe('')
-    expect(stdout).toBe('Stopping precise-watcher...\n')
+    expect(stdout).toBe('\nStopping precise-watcher\n')
   })
 })

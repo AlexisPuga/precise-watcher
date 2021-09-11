@@ -24,7 +24,7 @@ const { argv } = yargs(hideBin(process.argv))
   }, async (argv) => {
     process.on('exit', shutdown)
 
-    log('info', 'Starting precise-watcher...')
+    log('info', 'Starting precise-watcher')
     await start(argv)
   })
   .command('stop', 'Stop watching files.', {}, () => stop())

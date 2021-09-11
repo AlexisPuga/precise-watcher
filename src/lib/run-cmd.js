@@ -5,7 +5,8 @@ module.exports = async (cmd, args, options) => await new Promise((resolve, rejec
   const child = spawn(cmd, args, options)
   const { stdout, stderr } = child
 
-  log('info', `Running ${cmd}`)
+  log('info', `\nRunning ${cmd}`)
+  log('verbose', `▸ ${cmd} ${args.join(' ')}`)
 
   stdout.on('data', (data) => {
     log('data', data.toString())
