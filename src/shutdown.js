@@ -1,11 +1,11 @@
 const stop = require('./stop')
-const logError = console.error
+const log = require('./lib/log')
 
 module.exports = () => {
   stop().then(() => {
     process.exit(0)
   }).catch((error) => {
-    logError(error)
+    log('error', error)
     process.exit(1)
   })
 }

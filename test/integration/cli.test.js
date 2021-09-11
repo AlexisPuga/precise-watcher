@@ -2,13 +2,24 @@ const path = require('path')
 const { promisify } = require('util')
 const { execFile } = require('child_process')
 const execFileAsync = promisify(execFile)
+const commonEnv = {
+  ...process.env,
+  // Disable stdout/stderr styling.
+  FORCE_COLOR: 0
+}
+
+// Disabling colors doesn't seem to work.
+// That's why we use regexp to test stderr and stdout.
+// require('colors').disable()
 
 describe('precise-watcher', () => {
   test.each([
     ['default', []],
     ['"start"', ['start']]
   ])('Should work with defaults using the %s command.', async ($0, args) => {
-    const { stderr, stdout } = await execFileAsync('bin/cli', args)
+    const { stderr, stdout } = await execFileAsync('bin/cli', args, {
+      env: commonEnv
+    })
 
     expect(stderr).toBe('')
     expect(stdout).toBe([
@@ -31,7 +42,7 @@ describe('precise-watcher', () => {
       config
     ]), {
       env: {
-        ...process.env,
+        ...commonEnv,
         DEBUG: 'precise-watcher'
       }
     })
@@ -47,7 +58,9 @@ describe('precise-watcher', () => {
   })
 
   it('Should handle the "stop" command.', async () => {
-    const { stdout, stderr } = await execFileAsync('bin/cli', ['stop'])
+    const { stdout, stderr } = await execFileAsync('bin/cli', ['stop'], {
+      env: commonEnv
+    })
 
     expect(stderr).toBe('')
     expect(stdout).toBe('Stopping precise-watcher...\n')

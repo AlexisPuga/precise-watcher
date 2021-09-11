@@ -9,11 +9,20 @@ const wait = async (ms) => new Promise((resolve) => {
 const mockDebugFn = jest.fn()
 // Based on https://github.com/kentor/flush-promises
 const flushPromises = () => new Promise((resolve) => global.setTimeout(resolve, 300))
+const consoleTypes = ['log', 'warn', 'error', 'debug', 'info']
+
+// Disable all logging.
+consoleTypes.forEach((type) => {
+  jest.spyOn(console, type).mockImplementation(() => {})
+})
 
 jest.mock('debug', () => {
   return jest.fn().mockImplementation(() => mockDebugFn)
 })
-jest.spyOn(console, 'log').mockImplementation(() => {})
+
+afterAll(() => {
+  jest.clearAllMocks()
+})
 
 describe('/src', () => {
   const preciseWatcher = require('../../src')

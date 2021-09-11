@@ -1,8 +1,7 @@
 const path = require('path')
 const debug = require('debug')('precise-watcher')
 const runCmd = require('./lib/run-cmd')
-const log = console.log
-const logError = console.error
+const log = require('./lib/log')
 const normalizeEventArgs = (eventName, args) => {
   const getArg = (chokidarArgsIndexes) => args[chokidarArgsIndexes[eventName]]
   const path = getArg({
@@ -126,7 +125,7 @@ module.exports = (eventName, commands, {
 
       debug(`Running ${cmd}, args: ${JSON.stringify(cmdArgs)}, options: ${JSON.stringify(cmdOptions)}.`)
       runCmd(cmd, cmdArgs, cmdOptions).then(async (status) => {
-        log(`${cmd} exited with status ${status}`)
+        log('info', `${cmd} exited with status ${status}`)
 
         if (serial) {
           debug('Calling next command in serial...')
@@ -154,7 +153,7 @@ module.exports = (eventName, commands, {
     debug('Running commands...')
     await next(commands)
   } catch (exception) {
-    logError(exception)
+    log('error', exception)
     process.exitCode = 1
   }
 }

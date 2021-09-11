@@ -5,7 +5,7 @@ const readConfig = require('./lib/read-config')
 const handleEvent = require('./handle-event')
 const allWatchers = require('./watchers')
 const ignoreFromFile = require('./lib/ignore-from-file')
-const logError = console.error
+const log = require('./lib/log')
 
 module.exports = async (options) => {
   const {
@@ -50,7 +50,9 @@ module.exports = async (options) => {
 
       if (ignoreFrom) {
         const filepath = path.join(userDirectory, ignoreFrom)
-        const sourcesToIgnore = await (ignoreFromFile(filepath).catch(logError))
+        const sourcesToIgnore = await (ignoreFromFile(filepath)
+          .catch((error) => log('error', error))
+        )
         // Workaroud:
         // We negate ignored sources because it seems that the "ignore"
         // option in chokidar watches files and THEN ignores them.
