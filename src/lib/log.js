@@ -13,4 +13,9 @@ colors.setTheme({
   error: 'red'
 })
 
-module.exports = (color, msg) => console.log(colors[color](msg))
+module.exports = (color, msg) => {
+  const log = console[/info|warn|debug|error/.test(color) ? color : 'log']
+  const styledMsg = colors[color](msg)
+
+  log(styledMsg)
+}
