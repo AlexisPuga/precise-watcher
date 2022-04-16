@@ -43,14 +43,14 @@
   },
   "homepage": "https://github.com/AlexisPuga/precise-watcher#readme",
   "devDependencies": {
-    "eslint": "^8.6.0",
+    "eslint": "^7.27.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.23.3",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-promise": "^5.1.0",
     "fs-extra": "^10.0.0",
     "jest": "^27.0.1",
-    "jest-runner-eslint": "^1.0.0"
+    "jest-runner-eslint": "^0.10.0"
   },
   "dependencies": {
     "chokidar": "^3.5.1",
