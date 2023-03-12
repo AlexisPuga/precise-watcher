@@ -133,7 +133,7 @@ start().then(async (watchers) => {
   const allClosedWatchers = await stop()
 
   // To exit:
-  shutdow() // Calls stop() internally.
+  shutdown() // Calls stop() internally.
 }) // ...
 ```
 With async/await:
